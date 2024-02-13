@@ -3,7 +3,7 @@
 
 [package]
 name = "twilights_program"
-version = "0.1.0"
+version = "0.0.0"
 authors = ["SchokiCoder <afschoknecht@tutanota.com>"]
 repository = "https://github.com/SchokiCoder/twilights_program"
 edition = "2021"
