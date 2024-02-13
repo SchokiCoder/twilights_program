@@ -10,6 +10,10 @@
 
 + add cli
 + add window
++ add proper query loop
+
+Also add theme method to application.
+
 - add text style
 - add text logic for intro
 - add text logic for content

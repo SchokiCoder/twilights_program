@@ -50,21 +50,24 @@ impl Sandbox for Twiggie {
 		}};
 
 		let content = column![
-			self.theme,
 			intro
 		];
 
-		container(content)
+		container(content).into()
 	}
-	
+
 	fn update(&mut self, _msg: Self::Message)
 	{
 		self.uptime = self.start.elapsed();
 	}
-	
+
 	fn title(&self) -> String
 	{
 		"Twilights program".into()
+	}
+
+	fn theme(&self) -> Theme {
+		self.theme.clone()
 	}
 }
 
@@ -78,27 +81,36 @@ fn main()
 	settings.window.size = (320, 200);
 	let settings = settings;
 
-	let mut input: [u8; 1] = [0];
+	let mut input: [u8; 2] = [0, 0];
 	let mut stdin = io::stdin();
 
-	println!("run program? (y/n)");
-	match stdin.read(&mut input) {
-	Ok(_) => {}
-	
-	Err(_) => {
-		panic!("Cannot read stdin");
-	}}
+	loop {
+		println!("run program? (y/n)");
 
-	match input[0] as char {
-	'y' => {
-		match Twiggie::run(settings) {
+		match stdin.read(&mut input) {
 		Ok(_) => {}
 		
-		Err(e) => {
-			panic!("Could not run program: {}", e);
+		Err(_) => {
+			panic!("Cannot read stdin");
 		}}
-	}
-	
-	_ => {}
+
+		match input[0] as char {
+		'y' => {
+			match Twiggie::run(settings) {
+			Ok(_) => {
+				break;
+			}
+			
+			Err(e) => {
+				panic!("Could not run program: {}", e);
+			}}
+		}
+		
+		'n' => {
+			break;
+		}
+		
+		_ => {}
+		}
 	}
 }
