@@ -10,7 +10,9 @@ Also add theme method to application.
 
 See docs/rewrite.md for the why.
 
-- add theme
++ add theme
+- add font... shadow?
+  (the purple outline)
 - add timed text logic for intro
 - add timed text logic for content
 - add graphics
