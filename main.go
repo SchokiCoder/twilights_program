@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"os"
+	"time"
 )
 
 type twiTheme struct {}
@@ -40,37 +41,16 @@ func (twiTheme) Size(_ fyne.ThemeSizeName) float32 {
 }
 
 /*
-type TwiColor struct {}
+type twiColor struct {}
 
-type TwiSettings struct {}
-
-type TwiApp struct {}
-
-func (tc TwiColor) RGBA() (r, g, b, a uint32) {
+func (tc twiColor) RGBA() (r, g, b, a uint32) {
 	return 54, 254, 204, 255
 	//background: Color::from_rgb(0.24, 0.643, 0.565),
-}
-
-func (ts TwiSettings) Theme() TwiTheme {
-	return TwiTheme {}
-}
-
-func (ts TwiSettings) Scale() float32 {
-	return 2.0
-}
-
-func New() TwiApp {
-	return TwiApp {}
-}
-
-func (t TwiApp) Settings() TwiSettings {
-	return TwiSettings {}
 }
 */
 
 func main() {
 	var a = app.NewWithID("twilights_program")
-	var active = true;
 	var win = a.NewWindow("Twilight's Program")
 	var intro = widget.NewLabel("YOU ARE NOW")
 	var cont = container.NewVBox(intro)
@@ -79,9 +59,20 @@ func main() {
 	a.Settings().SetTheme(twiTheme {})
 	win.SetContent(cont)
 	win.SetFixedSize(true)
-	win.Resize(fyne.Size {320, 200})
+	win.Resize(fyne.Size {Width: 320, Height: 200})
 
-	for active {
+	appOnStarted := func() {
+		var start = time.Now()
+
+		go func() {
+			for time.Since(start) < 5_000_000_000 {}
+			intro.SetText(fmt.Sprintf("%v\n%v", intro.Text, "DOG"))
+		}()
+	}
+	a.Lifecycle().SetOnStarted(appOnStarted)
+
+	mainloop:
+	for {
 		fmt.Printf("run program? (y/n)\n");
 
 		_, err := os.Stdin.Read(input)
@@ -92,12 +83,9 @@ func main() {
 		switch input[0] {
 		case 'y':
 			win.ShowAndRun()
-			active = false
-		
+			fallthrough
 		case 'n':
-			active = false
-		
-		default:
+			break mainloop
 		}
 	}
 }
