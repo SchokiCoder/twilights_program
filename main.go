@@ -49,6 +49,23 @@ func (tc twiColor) RGBA() (r, g, b, a uint32) {
 }
 */
 
+/*
+The durations and times are based on the video being 24 frames/second,
+in which 1 frame lasts 41_666_666 nanos.
+*/
+const (
+	IntroDogTime = 1_041_666_666
+	GameStartTime = IntroDogTime + 1_791_666_666
+	IntroLifetime = IntroDogTime + 1_875_000_000
+
+	EyeOpenedDuration = 208_333_333
+	EyeClosedDuration = 125_000_000
+
+	JoyThroughWagsDelay = 41_666_666
+
+	WagsUntilJoy = 5
+)
+
 func main() {
 	var a = app.NewWithID("twilights_program")
 	var win = a.NewWindow("Twilight's Program")
@@ -65,7 +82,7 @@ func main() {
 		var start = time.Now()
 
 		go func() {
-			for time.Since(start) < 5_000_000_000 {}
+			for time.Since(start) < IntroDogTime {}
 			intro.SetText(fmt.Sprintf("%v\n%v", intro.Text, "DOG"))
 		}()
 	}
