@@ -80,7 +80,8 @@ func main() {
 	win.Resize(fyne.Size {Width: 320, Height: 200})
 
 	appOnStarted := func() {
-		var start = time.Now()
+		var start, eyeMovement time.Time
+		start = time.Now()
 
 		go func() {
 			for time.Since(start) < IntroDogTime {}
@@ -94,7 +95,18 @@ func main() {
 
 		go func() {
 			for time.Since(start) < IntroLifetime {}
+			eyeMovement = time.Now()
 			intro.SetText("")
+
+			for {
+				for time.Since(eyeMovement) < EyeOpenedDuration {}
+				fmt.Printf("Eye closed, please add gfx\n")
+				eyeMovement = time.Now()
+
+				for time.Since(eyeMovement) < EyeClosedDuration {}
+				fmt.Printf("Eye opened, please add gfx\n")
+				eyeMovement = time.Now()
+			}
 		}()
 	}
 	a.Lifecycle().SetOnStarted(appOnStarted)

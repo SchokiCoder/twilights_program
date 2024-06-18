@@ -17,7 +17,7 @@ See docs/rewrite.md for the why.
 
 + implement timer GameStartTime
 + implement timer IntroLifetime
-- implement blink
++ implement blink logic
   (implement duration EyeOpenedDuration
   implement duration EyeClosedDuration)
 
