@@ -15,11 +15,11 @@ See docs/rewrite.md for the why.
 + add timed text logic for intro
 + properly time intro
 
-- implement timer GameStartTime
++ implement timer GameStartTime
 - implement timer IntroLifetime
 - implement blink
-- implement duration EyeOpenedDuration
-- implement duration EyeClosedDuration
+  (implement duration EyeOpenedDuration
+  implement duration EyeClosedDuration)
 
 - add wag ability
   (press space?, speed cap as seen in source?)

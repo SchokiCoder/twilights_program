@@ -68,9 +68,10 @@ const (
 
 func main() {
 	var a = app.NewWithID("twilights_program")
+	var wag = widget.NewLabel("wag wag wag wag wag wag wag wag wag wag wag")
 	var win = a.NewWindow("Twilight's Program")
 	var intro = widget.NewLabel("YOU ARE NOW")
-	var cont = container.NewVBox(intro)
+	var cont = container.NewVBox(intro, wag)
 	var input = make([]byte, 2)
 
 	a.Settings().SetTheme(twiTheme {})
@@ -85,6 +86,12 @@ func main() {
 			for time.Since(start) < IntroDogTime {}
 			intro.SetText(fmt.Sprintf("%v\n%v", intro.Text, "DOG"))
 		}()
+
+		go func() {
+			for time.Since(start) < GameStartTime {}
+			wag.SetText("remove my.SetText() and animate me please")
+		}()
+
 	}
 	a.Lifecycle().SetOnStarted(appOnStarted)
 
