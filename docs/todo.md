@@ -16,7 +16,7 @@ See docs/rewrite.md for the why.
 + properly time intro
 
 + implement timer GameStartTime
-- implement timer IntroLifetime
++ implement timer IntroLifetime
 - implement blink
   (implement duration EyeOpenedDuration
   implement duration EyeClosedDuration)

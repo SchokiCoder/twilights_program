@@ -92,6 +92,10 @@ func main() {
 			wag.SetText("remove my.SetText() and animate me please")
 		}()
 
+		go func() {
+			for time.Since(start) < IntroLifetime {}
+			intro.SetText("")
+		}()
 	}
 	a.Lifecycle().SetOnStarted(appOnStarted)
 
