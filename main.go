@@ -76,6 +76,7 @@ func main() {
 	var cont       *fyne.Container
 	var gameActive bool
 	var lblWag     *widget.Label
+	var wags       int
 	var win        fyne.Window
 	var lblIntro   *widget.Label
 	var input      []byte
@@ -83,6 +84,15 @@ func main() {
 	btnWagOnTapped := func() {
 		if gameActive {
 			fmt.Printf("Wagged\n")
+		}
+
+		wags++
+		if wags == WagsUntilJoy {
+			go func() {
+				joyDelayBegin := time.Now()
+				for time.Since(joyDelayBegin) < JoyThroughWagsDelay {}
+				fmt.Printf("Joy expression started\n")
+			}()
 		}
 	}
 
@@ -122,11 +132,11 @@ func main() {
 
 			for gameActive {
 				for time.Since(eyeMovement) < EyeOpenedDuration {}
-				fmt.Printf("Eye closed, please add gfx\n")
+				fmt.Printf("Eye closed\n")
 				eyeMovement = time.Now()
 
 				for time.Since(eyeMovement) < EyeClosedDuration {}
-				fmt.Printf("Eye opened, please add gfx\n")
+				fmt.Printf("Eye opened\n")
 				eyeMovement = time.Now()
 			}
 		}()

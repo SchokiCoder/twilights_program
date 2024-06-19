@@ -22,8 +22,7 @@ See docs/rewrite.md for the why.
   implement duration EyeClosedDuration)
 
 + add wag ability logic
-- implement WagsUntilJoy
-- implement JoyThroughWagsDelay
++ add joy logic
 
 - add font... shadow? for intro text
   (the purple outline)
