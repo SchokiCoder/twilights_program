@@ -21,8 +21,7 @@ See docs/rewrite.md for the why.
   (implement duration EyeOpenedDuration
   implement duration EyeClosedDuration)
 
-- add wag ability
-  (press space?, speed cap as seen in source?)
++ add wag ability logic
 - implement WagsUntilJoy
 - implement JoyThroughWagsDelay
 
@@ -30,6 +29,7 @@ See docs/rewrite.md for the why.
   (the purple outline)
 - properly place intro text
 
+- consider wag speed cap (max = as seen in source)
 - add "wag wag wag..." background text
 
 - add graphics

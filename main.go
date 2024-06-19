@@ -19,6 +19,10 @@ type twiTheme struct {}
 
 func (twiTheme) Color(c fyne.ThemeColorName, _ fyne.ThemeVariant) color.Color {
 	switch c {
+	case theme.ColorNameHover:
+		fallthrough
+	case theme.ColorNameButton:
+		fallthrough
 	case theme.ColorNameBackground:
 		return &color.RGBA {54, 254, 204, 255}
 	case theme.ColorNameShadow:
@@ -67,12 +71,29 @@ const (
 )
 
 func main() {
-	var a = app.NewWithID("twilights_program")
-	var wag = widget.NewLabel("wag wag wag wag wag wag wag wag wag wag wag")
-	var win = a.NewWindow("Twilight's Program")
-	var intro = widget.NewLabel("YOU ARE NOW")
-	var cont = container.NewVBox(intro, wag)
-	var input = make([]byte, 2)
+	var a          fyne.App
+	var btnWag     *widget.Button
+	var cont       *fyne.Container
+	var gameActive bool
+	var lblWag     *widget.Label
+	var win        fyne.Window
+	var lblIntro   *widget.Label
+	var input      []byte
+
+	btnWagOnTapped := func() {
+		if gameActive {
+			fmt.Printf("Wagged\n")
+		}
+	}
+
+	a = app.NewWithID("twilights_program")
+	btnWag = widget.NewButton("Wag! (should be invis soon)", btnWagOnTapped)
+	gameActive = false
+	lblWag = widget.NewLabel("wag wag wag wag wag wag wag wag wag wag wag")
+	win = a.NewWindow("Twilight's Program")
+	lblIntro = widget.NewLabel("YOU ARE NOW")
+	cont = container.NewVBox(btnWag, lblIntro, lblWag)
+	input = make([]byte, 2)
 
 	a.Settings().SetTheme(twiTheme {})
 	win.SetContent(cont)
@@ -85,20 +106,21 @@ func main() {
 
 		go func() {
 			for time.Since(start) < IntroDogTime {}
-			intro.SetText(fmt.Sprintf("%v\n%v", intro.Text, "DOG"))
+			lblIntro.SetText(fmt.Sprintf("%v\n%v", lblIntro.Text, "DOG"))
 		}()
 
 		go func() {
 			for time.Since(start) < GameStartTime {}
-			wag.SetText("remove my.SetText() and animate me please")
+			lblWag.SetText("remove my.SetText() and animate me please")
+			gameActive = true
 		}()
 
 		go func() {
 			for time.Since(start) < IntroLifetime {}
 			eyeMovement = time.Now()
-			intro.SetText("")
+			lblIntro.SetText("")
 
-			for {
+			for gameActive {
 				for time.Since(eyeMovement) < EyeOpenedDuration {}
 				fmt.Printf("Eye closed, please add gfx\n")
 				eyeMovement = time.Now()
@@ -110,6 +132,11 @@ func main() {
 		}()
 	}
 	a.Lifecycle().SetOnStarted(appOnStarted)
+
+	appOnStopped := func() {
+		gameActive = false
+	}
+	a.Lifecycle().SetOnStopped(appOnStopped)
 
 	mainloop:
 	for {
