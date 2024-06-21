@@ -4,54 +4,16 @@
 package main
 
 import (
-	"image/color"
 	"fmt"
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/veandco/go-sdl2/sdl"
 	"os"
 	"time"
 )
 
-type twiTheme struct {}
-
-func (twiTheme) Color(c fyne.ThemeColorName, _ fyne.ThemeVariant) color.Color {
-	switch c {
-	case theme.ColorNameHover:
-		fallthrough
-	case theme.ColorNameButton:
-		fallthrough
-	case theme.ColorNameBackground:
-		return &color.RGBA {54, 254, 204, 255}
-	case theme.ColorNameShadow:
-		return &color.RGBA {R: 0xcc, G: 0xcc, B: 0xcc, A: 0xcc}
-	default:
-		return color.White
-	}
-}
-
-func (twiTheme) Font(style fyne.TextStyle) fyne.Resource {
-	return theme.LightTheme().Font(style)
-}
-
-func (twiTheme) Icon(n fyne.ThemeIconName) fyne.Resource {
-	return theme.DefaultTheme().Icon(n)
-}
-
-func (twiTheme) Size(_ fyne.ThemeSizeName) float32 {
-	return 30.0
-}
-
-/*
-type twiColor struct {}
-
-func (tc twiColor) RGBA() (r, g, b, a uint32) {
-	return 54, 254, 204, 255
-	//background: Color::from_rgb(0.24, 0.643, 0.565),
-}
-*/
+const (
+	tickrate = 60
+	timescale = 1.0
+)
 
 /*
 The durations and times are based on the video being 24 frames/second,
@@ -70,85 +32,29 @@ const (
 	WagsUntilJoy = 5
 )
 
+func draw(surface *sdl.Surface) {
+	bgColor := sdl.MapRGB(surface.Format, 54, 254, 204)
+	surface.FillRect(nil, bgColor)
+}
+
 func main() {
-	var a          fyne.App
-	var btnWag     *widget.Button
-	var cont       *fyne.Container
-	var gameActive bool
-	var lblWag     *widget.Label
-	var wags       int
-	var win        fyne.Window
-	var lblIntro   *widget.Label
-	var input      []byte
+	var (
+		delta       float64
+		err         error
+		eyeMovement time.Time
+		gameActive  bool
+		input       []byte
+		lastTick    time.Time
+		start       time.Time
+		surface     *sdl.Surface
+		wags        int
+		win         *sdl.Window
+	)
 
-	btnWagOnTapped := func() {
-		if gameActive {
-			fmt.Printf("Wagged\n")
-		}
-
-		wags++
-		if wags == WagsUntilJoy {
-			go func() {
-				joyDelayBegin := time.Now()
-				for time.Since(joyDelayBegin) < JoyThroughWagsDelay {}
-				fmt.Printf("Joy expression started\n")
-			}()
-		}
-	}
-
-	a = app.NewWithID("twilights_program")
-	btnWag = widget.NewButton("Wag! (should be invis soon)", btnWagOnTapped)
 	gameActive = false
-	lblWag = widget.NewLabel("wag wag wag wag wag wag wag wag wag wag wag")
-	win = a.NewWindow("Twilight's Program")
-	lblIntro = widget.NewLabel("YOU ARE NOW")
-	cont = container.NewVBox(btnWag, lblIntro, lblWag)
 	input = make([]byte, 2)
 
-	a.Settings().SetTheme(twiTheme {})
-	win.SetContent(cont)
-	win.SetFixedSize(true)
-	win.Resize(fyne.Size {Width: 320, Height: 200})
-
-	appOnStarted := func() {
-		var start, eyeMovement time.Time
-		start = time.Now()
-
-		go func() {
-			for time.Since(start) < IntroDogTime {}
-			lblIntro.SetText(fmt.Sprintf("%v\n%v", lblIntro.Text, "DOG"))
-		}()
-
-		go func() {
-			for time.Since(start) < GameStartTime {}
-			lblWag.SetText("remove my.SetText() and animate me please")
-			gameActive = true
-		}()
-
-		go func() {
-			for time.Since(start) < IntroLifetime {}
-			eyeMovement = time.Now()
-			lblIntro.SetText("")
-
-			for gameActive {
-				for time.Since(eyeMovement) < EyeOpenedDuration {}
-				fmt.Printf("Eye closed\n")
-				eyeMovement = time.Now()
-
-				for time.Since(eyeMovement) < EyeClosedDuration {}
-				fmt.Printf("Eye opened\n")
-				eyeMovement = time.Now()
-			}
-		}()
-	}
-	a.Lifecycle().SetOnStarted(appOnStarted)
-
-	appOnStopped := func() {
-		gameActive = false
-	}
-	a.Lifecycle().SetOnStopped(appOnStopped)
-
-	mainloop:
+confirmation:
 	for {
 		fmt.Printf("run program? (y/n)\n");
 
@@ -159,10 +65,96 @@ func main() {
 
 		switch input[0] {
 		case 'y':
-			win.ShowAndRun()
-			fallthrough
+			break confirmation
+
 		case 'n':
-			break mainloop
+			return
+		}
+	}
+
+	if err = sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+		panic(err)
+	}
+	defer sdl.Quit()
+
+	win, err = sdl.CreateWindow("Twilight's Program",
+		sdl.WINDOWPOS_UNDEFINED,
+		sdl.WINDOWPOS_UNDEFINED,
+		320,
+		200,
+		sdl.WINDOW_SHOWN)
+	if err != nil {
+		panic(err)
+	}
+	defer win.Destroy()
+
+	surface, err = win.GetSurface()
+	if err != nil {
+		panic(err)
+	}
+
+	start = time.Now()
+
+	go func() {
+		for time.Since(start) < IntroDogTime {}
+		fmt.Printf("add 'DOG' to intro\n")
+	}()
+
+	go func() {
+		for time.Since(start) < GameStartTime {}
+		fmt.Printf("start wag bg animation\n")
+		gameActive = true
+	}()
+
+	go func() {
+		for time.Since(start) < IntroLifetime {}
+		eyeMovement = time.Now()
+		fmt.Printf("hide intro text\n")
+
+		for gameActive {
+			for time.Since(eyeMovement) < EyeOpenedDuration {}
+			fmt.Printf("character: Eye closed\n")
+			eyeMovement = time.Now()
+
+			for time.Since(eyeMovement) < EyeClosedDuration {}
+			fmt.Printf("character: Eye opened\n")
+			eyeMovement = time.Now()
+		}
+	}()
+
+mainloop:
+	for {
+		rawDelta := time.Since(lastTick)
+		if rawDelta >= (1_000_000_000 / tickrate) {
+			delta = float64(rawDelta) / float64(1_000_000_000)
+			delta *= timescale
+			event := sdl.PollEvent()
+
+			draw(surface)
+
+			for ; event != nil; event = sdl.PollEvent() {
+				switch event.(type) {
+				case *sdl.QuitEvent:
+					gameActive = false
+					break mainloop
+
+				case *sdl.MouseButtonEvent:
+					if gameActive {
+						fmt.Printf("Wagged\n")
+					}
+
+					wags++
+					if wags == WagsUntilJoy {
+						go func() {
+							joyDelayBegin := time.Now()
+							for time.Since(joyDelayBegin) < JoyThroughWagsDelay {}
+							fmt.Printf("Joy expression started\n")
+						}()
+					}
+				}
+			}
+
+			lastTick = time.Now()
 		}
 	}
 }

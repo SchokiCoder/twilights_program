@@ -24,9 +24,15 @@ See docs/rewrite.md for the why.
 + add wag ability logic
 + add joy logic
 
-- add font... shadow? for intro text
++ replace fyne with sdl
+  cuz fyne is too restrictive
+  problems with that:
+  	+ get fonts reliably: make a font bitmap
+  	+ can ttf do font shadow: ttf.SetOutline()
+
+- add font outline for intro text
   (the purple outline)
-- properly place intro text
+- properly place text
 
 - consider wag speed cap (max = as seen in source)
 - add "wag wag wag..." background text
@@ -36,5 +42,5 @@ See docs/rewrite.md for the why.
 
 - add music ?
 
-- compare with source
+- compare with source material
 - set version 0.69.0
