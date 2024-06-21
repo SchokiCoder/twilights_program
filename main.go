@@ -32,9 +32,10 @@ const (
 	WagsUntilJoy = 5
 )
 
-func draw(surface *sdl.Surface) {
+func draw(surface *sdl.Surface, win *sdl.Window) {
 	bgColor := sdl.MapRGB(surface.Format, 54, 254, 204)
 	surface.FillRect(nil, bgColor)
+	win.UpdateSurface()
 }
 
 // Returns whether mainloop should stay active.
@@ -163,7 +164,7 @@ mainloop:
 			delta = float64(rawDelta) / float64(1_000_000_000)
 			delta *= timescale
 
-			draw(surface)
+			draw(surface, win)
 
 			if handleEvents(&gameActive, &wags) == false {
 				break mainloop
