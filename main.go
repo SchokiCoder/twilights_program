@@ -37,6 +37,38 @@ func draw(surface *sdl.Surface) {
 	surface.FillRect(nil, bgColor)
 }
 
+// Returns whether mainloop should stay active.
+func handleEvents(gameActive *bool, wags *int) bool {
+	event := sdl.PollEvent()
+
+	for ; event != nil; event = sdl.PollEvent() {
+		switch event.(type) {
+		case *sdl.QuitEvent:
+			*gameActive = false
+			return false
+
+		case *sdl.MouseButtonEvent:
+			if *gameActive {
+				fmt.Printf("Wagged\n")
+			}
+
+			*wags++
+			if *wags == WagsUntilJoy {
+				go startTwiJoy()
+			}
+		}
+	}
+
+	return true
+}
+
+func startTwiJoy() {
+	joyDelayBegin := time.Now()
+	for time.Since(joyDelayBegin) < JoyThroughWagsDelay {}
+
+	fmt.Printf("Joy expression started\n")
+}
+
 func main() {
 	var (
 		delta       float64
@@ -95,9 +127,11 @@ confirmation:
 
 	start = time.Now()
 
+	fmt.Printf("\"YOU ARE NOW\"\n")
+
 	go func() {
 		for time.Since(start) < IntroDogTime {}
-		fmt.Printf("add 'DOG' to intro\n")
+		fmt.Printf("\"DOG\"\n")
 	}()
 
 	go func() {
@@ -128,30 +162,11 @@ mainloop:
 		if rawDelta >= (1_000_000_000 / tickrate) {
 			delta = float64(rawDelta) / float64(1_000_000_000)
 			delta *= timescale
-			event := sdl.PollEvent()
 
 			draw(surface)
 
-			for ; event != nil; event = sdl.PollEvent() {
-				switch event.(type) {
-				case *sdl.QuitEvent:
-					gameActive = false
-					break mainloop
-
-				case *sdl.MouseButtonEvent:
-					if gameActive {
-						fmt.Printf("Wagged\n")
-					}
-
-					wags++
-					if wags == WagsUntilJoy {
-						go func() {
-							joyDelayBegin := time.Now()
-							for time.Since(joyDelayBegin) < JoyThroughWagsDelay {}
-							fmt.Printf("Joy expression started\n")
-						}()
-					}
-				}
+			if handleEvents(&gameActive, &wags) == false {
+				break mainloop
 			}
 
 			lastTick = time.Now()
