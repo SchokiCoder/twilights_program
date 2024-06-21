@@ -49,13 +49,15 @@ func handleEvents(gameActive *bool, wags *int) bool {
 			return false
 
 		case *sdl.MouseButtonEvent:
-			if *gameActive {
-				fmt.Printf("Wagged\n")
-			}
+			if event.GetType() == sdl.MOUSEBUTTONDOWN {
+				if *gameActive {
+					fmt.Printf("Wagged\n")
+				}
 
-			*wags++
-			if *wags == WagsUntilJoy {
-				go startTwiJoy()
+				*wags++
+				if *wags == WagsUntilJoy {
+					go startTwiJoy()
+				}
 			}
 		}
 	}
