@@ -30,9 +30,19 @@ See docs/rewrite.md for the why.
   	+ get fonts reliably: make a font bitmap
   	+ can ttf do font shadow: ttf.SetOutline()
 
-- add font outline for intro text
-  (the purple outline)
-- properly place text
++ add intro text
+
+For now, with just some font as mock up.
+
+- add bg text
+
+For now, with just some font as mock up.
+
+- add mock up pony
+- add mock up hearts
+
+- timescale and delta are not yet used anywhere
+  The timers also ignore the timescale.
 
 - consider wag speed cap (max = as seen in source)
 - add "wag wag wag..." background text
@@ -40,7 +50,14 @@ See docs/rewrite.md for the why.
 - add graphics
   see issue 1
 
+- add font outline for intro text
+  (the purple outline)
+
 - add music ?
+  Split track into idle part und action part.
+  The idle part plays as soon as the app starts,
+  before and during the "run program?" confirmation.
+  The action part starts as soon as the sdl window is opened.
 
 - compare with source material
 - set version 0.69.0

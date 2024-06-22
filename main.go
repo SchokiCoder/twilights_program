@@ -6,11 +6,14 @@ package main
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	"os"
 	"time"
 )
 
 const (
+	gfxWindowWidth = 320
+	gfxWindowHeight = 200
 	tickrate = 60
 	timescale = 1.0
 )
@@ -32,9 +35,31 @@ const (
 	WagsUntilJoy = 5
 )
 
-func draw(surface *sdl.Surface, win *sdl.Window) {
+func getIntroColor() sdl.Color {
+	return sdl.Color {
+		R: 255,
+		G: 255,
+		B: 255,
+	}
+}
+
+func draw(drawIntro int,
+	introR [2]sdl.Rect,
+	introS [2]*sdl.Surface,
+	surface *sdl.Surface,
+	win *sdl.Window) {
+
 	bgColor := sdl.MapRGB(surface.Format, 54, 254, 204)
 	surface.FillRect(nil, bgColor)
+
+	switch drawIntro {
+	case 2:
+		introS[1].Blit(nil, surface, &introR[1])
+		fallthrough
+	case 1:
+		introS[0].Blit(nil, surface, &introR[0])
+	}
+
 	win.UpdateSurface()
 }
 
@@ -75,10 +100,14 @@ func startTwiJoy() {
 func main() {
 	var (
 		delta       float64
+		drawIntro   int
 		err         error
 		eyeMovement time.Time
+		font        *ttf.Font
 		gameActive  bool
 		input       []byte
+		introR      [2]sdl.Rect
+		introS      [2]*sdl.Surface
 		lastTick    time.Time
 		start       time.Time
 		surface     *sdl.Surface
@@ -115,8 +144,8 @@ confirmation:
 	win, err = sdl.CreateWindow("Twilight's Program",
 		sdl.WINDOWPOS_UNDEFINED,
 		sdl.WINDOWPOS_UNDEFINED,
-		320,
-		200,
+		gfxWindowWidth,
+		gfxWindowHeight,
 		sdl.WINDOW_SHOWN)
 	if err != nil {
 		panic(err)
@@ -128,13 +157,37 @@ confirmation:
 		panic(err)
 	}
 
-	start = time.Now()
+	_ = ttf.Init()
+	defer ttf.Quit()
 
-	fmt.Printf("\"YOU ARE NOW\"\n")
+	font, err = ttf.OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 25)
+	if err != nil {
+		panic(err)
+	}
+	defer font.Close()
+
+	introS[0], _ = font.RenderUTF8Solid("YOU ARE NOW", getIntroColor())
+	defer introS[0].Free()
+
+	introS[1], _ = font.RenderUTF8Solid("DOG", getIntroColor())
+	defer introS[1].Free()
+
+	introR[1].W = introS[1].W
+	introR[1].H = introS[1].H
+	introR[1].X = gfxWindowWidth / 2 - introR[1].W / 2
+	introR[1].Y = gfxWindowHeight / 2 - introR[1].H / 2
+
+	introR[0].W = introS[0].W
+	introR[0].H = introS[0].H
+	introR[0].X = gfxWindowWidth / 2 - introR[0].W / 2
+	introR[0].Y = introR[1].Y - introR[1].H
+
+	start = time.Now()
+	drawIntro++
 
 	go func() {
 		for time.Since(start) < IntroDogTime {}
-		fmt.Printf("\"DOG\"\n")
+		drawIntro++
 	}()
 
 	go func() {
@@ -146,7 +199,7 @@ confirmation:
 	go func() {
 		for time.Since(start) < IntroLifetime {}
 		eyeMovement = time.Now()
-		fmt.Printf("hide intro text\n")
+		drawIntro = 0
 
 		for gameActive {
 			for time.Since(eyeMovement) < EyeOpenedDuration {}
@@ -166,7 +219,7 @@ mainloop:
 			delta = float64(rawDelta) / float64(1_000_000_000)
 			delta *= timescale
 
-			draw(surface, win)
+			draw(drawIntro, introR, introS, surface, win)
 
 			if handleEvents(&gameActive, &wags) == false {
 				break mainloop
