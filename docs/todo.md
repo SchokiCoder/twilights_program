@@ -34,18 +34,22 @@ See docs/rewrite.md for the why.
 
 For now, with just some font as mock up.
 
-- add bg text
++ add bg text with animation
 
 For now, with just some font as mock up.
+Also fix wrong aspect ratio (now 4:3), and tweak font size.
 
 - add mock up pony
 - add mock up hearts
 
-- timescale and delta are not yet used anywhere
-  The timers also ignore the timescale.
+- timescale and delta are not used everywhere
+  The timers fully ignore the timescale.
+  time.Since() and co must practically be banned.
 
 - consider wag speed cap (max = as seen in source)
-- add "wag wag wag..." background text
+
+- start 1st bg text line at proper position
+  (uppermost visible pixelrow is at Y: 0)
 
 - add graphics
   see issue 1

@@ -13,7 +13,7 @@ import (
 
 const (
 	gfxWindowWidth = 320
-	gfxWindowHeight = 200
+	gfxWindowHeight = 240
 	tickrate = 60
 	timescale = 1.0
 )
@@ -23,6 +23,9 @@ The durations and times are based on the video being 24 frames/second,
 in which 1 frame lasts 41_666_666 nanos.
 */
 const (
+	BgLineTravelTime = 625_000_000
+	BgMaxLines = 4
+
 	IntroDogTime = 1_041_666_666
 	GameStartTime = IntroDogTime + 1_791_666_666
 	IntroLifetime = IntroDogTime + 1_875_000_000
@@ -35,6 +38,21 @@ const (
 	WagsUntilJoy = 5
 )
 
+const (
+	// pixel / second
+	BgLineVelocity = gfxWindowHeight * 1_000_000_000 / BgLineTravelTime
+
+	BgLineSpawnTime = BgLineTravelTime / BgMaxLines
+)
+
+func getBgTextColor() sdl.Color {
+	return sdl.Color {
+		R: 25,
+		G: 255,
+		B: 0,
+	}
+}
+
 func getIntroColor() sdl.Color {
 	return sdl.Color {
 		R: 255,
@@ -43,13 +61,15 @@ func getIntroColor() sdl.Color {
 	}
 }
 
-func draw(drawIntro int,
+func draw(bgLineYs []float64,
+	bgLine *sdl.Surface,
+	drawIntro int,
 	introR [2]sdl.Rect,
 	introS [2]*sdl.Surface,
 	surface *sdl.Surface,
 	win *sdl.Window) {
 
-	bgColor := sdl.MapRGB(surface.Format, 54, 254, 204)
+	bgColor := sdl.MapRGB(surface.Format, 49, 229, 184)
 	surface.FillRect(nil, bgColor)
 
 	switch drawIntro {
@@ -58,6 +78,17 @@ func draw(drawIntro int,
 		fallthrough
 	case 1:
 		introS[0].Blit(nil, surface, &introR[0])
+	}
+
+	var rect = sdl.Rect {
+		X: gfxWindowWidth / 2 - bgLine.W / 2,
+		Y: 0,
+		W: bgLine.W,
+		H: bgLine.H,
+	}
+	for i := 0; i < len(bgLineYs); i++ {
+		rect.Y = int32(bgLineYs[i])
+		bgLine.Blit(nil, surface, &rect)
 	}
 
 	win.UpdateSurface()
@@ -90,6 +121,25 @@ func handleEvents(gameActive *bool, wags *int) bool {
 	return true
 }
 
+func moveBgLines(bgLineYs *[]float64,
+	delta float64,
+	lastBgSpawn *time.Time,
+	lineHeight int32) {
+
+	if time.Since(*lastBgSpawn) >= BgLineSpawnTime {
+		*bgLineYs = append(*bgLineYs, float64(0 - lineHeight))
+		*lastBgSpawn = time.Now()
+	}
+
+	for i := 0; i < len(*bgLineYs); i++ {
+		(*bgLineYs)[i] += BgLineVelocity * delta
+	}
+
+	if len(*bgLineYs) > BgMaxLines + 1 {
+		*bgLineYs = (*bgLineYs)[1:]
+	}
+}
+
 func startTwiJoy() {
 	joyDelayBegin := time.Now()
 	for time.Since(joyDelayBegin) < JoyThroughWagsDelay {}
@@ -99,6 +149,8 @@ func startTwiJoy() {
 
 func main() {
 	var (
+		bgLineYs    []float64
+		bgText      *sdl.Surface
 		delta       float64
 		drawIntro   int
 		err         error
@@ -108,6 +160,7 @@ func main() {
 		input       []byte
 		introR      [2]sdl.Rect
 		introS      [2]*sdl.Surface
+		lastBgSpawn time.Time
 		lastTick    time.Time
 		start       time.Time
 		surface     *sdl.Surface
@@ -160,7 +213,7 @@ confirmation:
 	_ = ttf.Init()
 	defer ttf.Quit()
 
-	font, err = ttf.OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 25)
+	font, err = ttf.OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 32)
 	if err != nil {
 		panic(err)
 	}
@@ -182,7 +235,11 @@ confirmation:
 	introR[0].X = gfxWindowWidth / 2 - introR[0].W / 2
 	introR[0].Y = introR[1].Y - introR[1].H
 
+	bgText, _ = font.RenderUTF8Solid("wag wag wag wag", getBgTextColor())
+	bgLineYs = append(bgLineYs, 0)
+
 	start = time.Now()
+	lastBgSpawn = start
 	drawIntro++
 
 	go func() {
@@ -192,7 +249,6 @@ confirmation:
 
 	go func() {
 		for time.Since(start) < GameStartTime {}
-		fmt.Printf("start wag bg animation\n")
 		gameActive = true
 	}()
 
@@ -219,7 +275,20 @@ mainloop:
 			delta = float64(rawDelta) / float64(1_000_000_000)
 			delta *= timescale
 
-			draw(drawIntro, introR, introS, surface, win)
+			if gameActive {
+				moveBgLines(&bgLineYs,
+					delta,
+					&lastBgSpawn,
+					bgText.H)
+			}
+
+			draw(bgLineYs[:],
+				bgText,
+				drawIntro,
+				introR,
+				introS,
+				surface,
+				win)
 
 			if handleEvents(&gameActive, &wags) == false {
 				break mainloop
