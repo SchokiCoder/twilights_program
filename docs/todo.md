@@ -39,8 +39,11 @@ For now, with just some font as mock up.
 For now, with just some font as mock up.
 Also fix wrong aspect ratio (now 4:3), and tweak font size.
 
-- add mock up pony
++ add pony art
 - add mock up hearts
+
+- scale pony art up and then down to smudge it a bit?
+  do this at runtime !
 
 - timescale and delta are not used everywhere
   The timers fully ignore the timescale.
