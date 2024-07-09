@@ -120,6 +120,17 @@ func newPonyModel() PonyModel {
 	return ret
 }
 
+func (pm *PonyModel) Free() {
+	pm.Body.Free()
+	pm.Eye[0].Free()
+	pm.Eye[1].Free()
+	pm.Eye[2].Free()
+	pm.Rump[0].Free()
+	pm.Rump[1].Free()
+	pm.Tail[0].Free()
+	pm.Tail[1].Free()
+}
+
 func (pm PonyModel) Draw(surface *sdl.Surface) {
 	var rect sdl.Rect
 
@@ -296,6 +307,7 @@ confirmation:
 	}
 
 	ponyMdl = newPonyModel()
+	defer ponyMdl.Free()
 
 	_ = ttf.Init()
 	defer ttf.Quit()
