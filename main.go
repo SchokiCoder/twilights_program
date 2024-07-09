@@ -356,13 +356,17 @@ confirmation:
 		eyeMovement = time.Now()
 		drawIntro = 0
 
-		for gameActive {
+		for gameActive && ponyMdl.EyeIdx != 2 {
 			for time.Since(eyeMovement) < EyeOpenedDuration {}
-			ponyMdl.EyeIdx = 1
+			if ponyMdl.EyeIdx != 2 {
+				ponyMdl.EyeIdx = 1
+			}
 			eyeMovement = time.Now()
 
 			for time.Since(eyeMovement) < EyeClosedDuration {}
-			ponyMdl.EyeIdx = 0
+			if ponyMdl.EyeIdx != 2 {
+				ponyMdl.EyeIdx = 0
+			}
 			eyeMovement = time.Now()
 		}
 	}()

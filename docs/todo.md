@@ -41,7 +41,7 @@ Also fix wrong aspect ratio (now 4:3), and tweak font size.
 
 + add pony art
 + implement pony art
-- fix blink logic still running after joy has been reached
++ fix blink logic still running after joy has been reached
 - properly position and resize pony art
 - scale pony art up and then down to smudge it a bit?
   do this at runtime !
