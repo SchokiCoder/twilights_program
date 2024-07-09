@@ -61,24 +61,92 @@ func getIntroColor() sdl.Color {
 	}
 }
 
+type PonyModel struct {
+	Body    *sdl.Surface
+	Eye     [3]*sdl.Surface
+	EyeIdx  int
+	Rump    [2]*sdl.Surface
+	RumpIdx int
+	Tail    [2]*sdl.Surface
+	TailIdx int
+	X       int32
+	Y       int32
+}
+
+func newPonyModel() PonyModel {
+	var err error
+	var ret PonyModel
+
+	ret.Body, err = sdl.LoadBMP("pkg/pony_body.bmp")
+	if err != nil {
+		panic(err)
+	}
+
+	ret.Eye[0], err = sdl.LoadBMP("pkg/pony_eye.bmp")
+	if err != nil {
+		panic(err)
+	}
+
+	ret.Eye[1], err = sdl.LoadBMP("pkg/pony_eye_blink.bmp")
+	if err != nil {
+		panic(err)
+	}
+
+	ret.Eye[2], err = sdl.LoadBMP("pkg/pony_eye_joy.bmp")
+	if err != nil {
+		panic(err)
+	}
+
+	ret.Rump[0], err = sdl.LoadBMP("pkg/pony_rump_down.bmp")
+	if err != nil {
+		panic(err)
+	}
+
+	ret.Rump[1], err = sdl.LoadBMP("pkg/pony_rump_up.bmp")
+	if err != nil {
+		panic(err)
+	}
+
+	ret.Tail[0], err = sdl.LoadBMP("pkg/pony_tail_down.bmp")
+	if err != nil {
+		panic(err)
+	}
+
+	ret.Tail[1], err = sdl.LoadBMP("pkg/pony_tail_up.bmp")
+	if err != nil {
+		panic(err)
+	}
+
+	return ret
+}
+
+func (pm PonyModel) Draw(surface *sdl.Surface) {
+	var rect sdl.Rect
+
+	rect = sdl.Rect {X: pm.X, Y: pm.Y, W: pm.Body.W, H: pm.Body.H}
+	pm.Body.Blit(nil, surface, &rect)
+
+	rect = sdl.Rect {X: pm.X, Y: pm.Y, W: pm.Eye[pm.EyeIdx].W, H: pm.Eye[pm.EyeIdx].H}
+	pm.Eye[pm.EyeIdx].Blit(nil, surface, &rect)
+
+	rect = sdl.Rect {X: pm.X, Y: pm.Y, W: pm.Rump[pm.RumpIdx].W, H: pm.Rump[pm.RumpIdx].H}
+	pm.Rump[pm.RumpIdx].Blit(nil, surface, &rect)
+
+	rect = sdl.Rect {X: pm.X, Y: pm.Y, W: pm.Tail[pm.TailIdx].W, H: pm.Tail[pm.TailIdx].H}
+	pm.Tail[pm.TailIdx].Blit(nil, surface, &rect)
+}
+
 func draw(bgLineYs []float64,
 	bgLine *sdl.Surface,
 	drawIntro int,
 	introR [2]sdl.Rect,
 	introS [2]*sdl.Surface,
+	ponyMdl PonyModel,
 	surface *sdl.Surface,
 	win *sdl.Window) {
 
 	bgColor := sdl.MapRGB(surface.Format, 49, 229, 184)
 	surface.FillRect(nil, bgColor)
-
-	switch drawIntro {
-	case 2:
-		introS[1].Blit(nil, surface, &introR[1])
-		fallthrough
-	case 1:
-		introS[0].Blit(nil, surface, &introR[0])
-	}
 
 	var rect = sdl.Rect {
 		X: gfxWindowWidth / 2 - bgLine.W / 2,
@@ -91,11 +159,21 @@ func draw(bgLineYs []float64,
 		bgLine.Blit(nil, surface, &rect)
 	}
 
+	ponyMdl.Draw(surface)
+
+	switch drawIntro {
+	case 2:
+		introS[1].Blit(nil, surface, &introR[1])
+		fallthrough
+	case 1:
+		introS[0].Blit(nil, surface, &introR[0])
+	}
+
 	win.UpdateSurface()
 }
 
 // Returns whether mainloop should stay active.
-func handleEvents(gameActive *bool, wags *int) bool {
+func handleEvents(gameActive *bool, ponyMdl *PonyModel, wags *int) bool {
 	event := sdl.PollEvent()
 
 	for ; event != nil; event = sdl.PollEvent() {
@@ -107,12 +185,18 @@ func handleEvents(gameActive *bool, wags *int) bool {
 		case *sdl.MouseButtonEvent:
 			if event.GetType() == sdl.MOUSEBUTTONDOWN {
 				if *gameActive {
-					fmt.Printf("Wagged\n")
+					if ponyMdl.RumpIdx == 0 {
+						ponyMdl.RumpIdx = 1
+						ponyMdl.TailIdx = 1
+					} else {
+						ponyMdl.RumpIdx = 0
+						ponyMdl.TailIdx = 0
+					}
 				}
 
 				*wags++
 				if *wags == WagsUntilJoy {
-					go startTwiJoy()
+					go startTwiJoy(ponyMdl)
 				}
 			}
 		}
@@ -140,11 +224,11 @@ func moveBgLines(bgLineYs *[]float64,
 	}
 }
 
-func startTwiJoy() {
+func startTwiJoy(ponyMdl *PonyModel) {
 	joyDelayBegin := time.Now()
 	for time.Since(joyDelayBegin) < JoyThroughWagsDelay {}
 
-	fmt.Printf("Joy expression started\n")
+	ponyMdl.EyeIdx = 2
 }
 
 func main() {
@@ -162,6 +246,7 @@ func main() {
 		introS      [2]*sdl.Surface
 		lastBgSpawn time.Time
 		lastTick    time.Time
+		ponyMdl     PonyModel
 		start       time.Time
 		surface     *sdl.Surface
 		wags        int
@@ -209,6 +294,8 @@ confirmation:
 	if err != nil {
 		panic(err)
 	}
+
+	ponyMdl = newPonyModel()
 
 	_ = ttf.Init()
 	defer ttf.Quit()
@@ -259,11 +346,11 @@ confirmation:
 
 		for gameActive {
 			for time.Since(eyeMovement) < EyeOpenedDuration {}
-			fmt.Printf("character: Eye closed\n")
+			ponyMdl.EyeIdx = 1
 			eyeMovement = time.Now()
 
 			for time.Since(eyeMovement) < EyeClosedDuration {}
-			fmt.Printf("character: Eye opened\n")
+			ponyMdl.EyeIdx = 0
 			eyeMovement = time.Now()
 		}
 	}()
@@ -287,10 +374,11 @@ mainloop:
 				drawIntro,
 				introR,
 				introS,
+				ponyMdl,
 				surface,
 				win)
 
-			if handleEvents(&gameActive, &wags) == false {
+			if handleEvents(&gameActive, &ponyMdl, &wags) == false {
 				break mainloop
 			}
 

@@ -40,10 +40,15 @@ For now, with just some font as mock up.
 Also fix wrong aspect ratio (now 4:3), and tweak font size.
 
 + add pony art
-- add mock up hearts
-
++ implement pony art
+- fix blink logic still running after joy has been reached
+- properly position and resize pony art
 - scale pony art up and then down to smudge it a bit?
   do this at runtime !
+- add gimp layer to bmp export script?
+
+- add hearts art
+- implement hearts art
 
 - timescale and delta are not used everywhere
   The timers fully ignore the timescale.
