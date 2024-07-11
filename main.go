@@ -15,7 +15,7 @@ const (
 	gfxWindowWidth = 320
 	gfxWindowHeight = 240
 	tickrate = 60
-	timescale = 1.0
+	timescale = 0.1
 )
 
 /*
@@ -23,26 +23,26 @@ The durations and times are based on the video being 24 frames/second,
 in which 1 frame lasts 41_666_666 nanos.
 */
 const (
-	BgLineTravelTime = 625_000_000
+	BgLineTravelTime = 0.625
 	BgMaxLines = 4
 
-	IntroDogTime = 1_041_666_666
-	GameStartTime = IntroDogTime + 1_791_666_666
-	IntroLifetime = IntroDogTime + 1_875_000_000
+	IntroDogTime = 1.041666666
+	GameStartTime = IntroDogTime + 1.791666666
+	IntroLifetime = IntroDogTime + 1.875
 
-	EyeOpenedDuration = 208_333_333
-	EyeClosedDuration = 125_000_000
+	EyeOpenedDuration = 0.208333333
+	EyeClosedDuration = 0.125
 
-	JoyThroughWagsDelay = 41_666_666
+	JoyThroughWagsDelay = 0.041666666
 
 	WagsUntilJoy = 5
 )
 
 const (
 	// pixel / second
-	BgLineVelocity = gfxWindowHeight * 1_000_000_000 / BgLineTravelTime
+	BgLineVelocity = float64(gfxWindowHeight) * 1.0 / BgLineTravelTime
 
-	BgLineSpawnTime = BgLineTravelTime / BgMaxLines
+	BgLineSpawnTime = BgLineTravelTime / float64(BgMaxLines)
 )
 
 func getBgTextColor() sdl.Color {
@@ -218,12 +218,13 @@ func handleEvents(gameActive *bool, ponyMdl *PonyModel, wags *int) bool {
 
 func moveBgLines(bgLineYs *[]float64,
 	delta float64,
-	lastBgSpawn *time.Time,
+	untilBgSpawn *float64,
 	lineHeight int32) {
 
-	if time.Since(*lastBgSpawn) >= BgLineSpawnTime {
+	*untilBgSpawn -= delta
+	if *untilBgSpawn <= 0 {
 		*bgLineYs = append(*bgLineYs, float64(0 - lineHeight))
-		*lastBgSpawn = time.Now()
+		*untilBgSpawn = BgLineSpawnTime
 	}
 
 	for i := 0; i < len(*bgLineYs); i++ {
@@ -237,31 +238,31 @@ func moveBgLines(bgLineYs *[]float64,
 
 func startTwiJoy(ponyMdl *PonyModel) {
 	joyDelayBegin := time.Now()
-	for time.Since(joyDelayBegin) < JoyThroughWagsDelay {}
+	for time.Since(joyDelayBegin).Seconds() * timescale < JoyThroughWagsDelay {}
 
 	ponyMdl.EyeIdx = 2
 }
 
 func main() {
 	var (
-		bgLineYs    []float64
-		bgText      *sdl.Surface
-		delta       float64
-		drawIntro   int
-		err         error
-		eyeMovement time.Time
-		font        *ttf.Font
-		gameActive  bool
-		input       []byte
-		introR      [2]sdl.Rect
-		introS      [2]*sdl.Surface
-		lastBgSpawn time.Time
-		lastTick    time.Time
-		ponyMdl     PonyModel
-		start       time.Time
-		surface     *sdl.Surface
-		wags        int
-		win         *sdl.Window
+		bgLineYs     []float64
+		bgText       *sdl.Surface
+		delta        float64
+		drawIntro    int
+		err          error
+		eyeMovement  time.Time
+		font         *ttf.Font
+		gameActive   bool
+		input        []byte
+		introR       [2]sdl.Rect
+		introS       [2]*sdl.Surface
+		lastTick     time.Time
+		ponyMdl      PonyModel
+		start        time.Time
+		surface      *sdl.Surface
+		untilBgSpawn float64
+		wags         int
+		win          *sdl.Window
 	)
 
 	gameActive = false
@@ -338,38 +339,43 @@ confirmation:
 	bgLineYs = append(bgLineYs, 0)
 
 	start = time.Now()
-	lastBgSpawn = start
+	untilBgSpawn = BgLineSpawnTime
 	drawIntro++
 
 	go func() {
-		for time.Since(start) < IntroDogTime {}
+		for time.Since(start).Seconds() * timescale < IntroDogTime {}
 		drawIntro++
 	}()
 
 	go func() {
-		for time.Since(start) < GameStartTime {}
+		for time.Since(start).Seconds() * timescale < GameStartTime {}
 		gameActive = true
 	}()
 
 	go func() {
-		for time.Since(start) < IntroLifetime {}
+		for time.Since(start).Seconds() * timescale < IntroLifetime {}
 		eyeMovement = time.Now()
 		drawIntro = 0
 
 		for gameActive && ponyMdl.EyeIdx != 2 {
-			for time.Since(eyeMovement) < EyeOpenedDuration {}
+			for time.Since(eyeMovement).Seconds() * timescale <
+				EyeOpenedDuration {}
+
 			if ponyMdl.EyeIdx != 2 {
 				ponyMdl.EyeIdx = 1
 			}
 			eyeMovement = time.Now()
 
-			for time.Since(eyeMovement) < EyeClosedDuration {}
+			for time.Since(eyeMovement).Seconds() * timescale <
+				EyeClosedDuration {}
+
 			if ponyMdl.EyeIdx != 2 {
 				ponyMdl.EyeIdx = 0
 			}
 			eyeMovement = time.Now()
 		}
 	}()
+
 
 mainloop:
 	for {
@@ -381,7 +387,7 @@ mainloop:
 			if gameActive {
 				moveBgLines(&bgLineYs,
 					delta,
-					&lastBgSpawn,
+					&untilBgSpawn,
 					bgText.H)
 			}
 
