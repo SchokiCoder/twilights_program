@@ -15,7 +15,7 @@ const (
 	gfxWindowWidth = 320
 	gfxWindowHeight = 240
 	tickrate = 60
-	timescale = 0.1
+	timescale = 1.0
 )
 
 /*
@@ -203,11 +203,11 @@ func handleEvents(gameActive *bool, ponyMdl *PonyModel, wags *int) bool {
 						ponyMdl.RumpIdx = 0
 						ponyMdl.TailIdx = 0
 					}
-				}
 
-				*wags++
-				if *wags == WagsUntilJoy {
-					go startTwiJoy(ponyMdl)
+					*wags++
+					if *wags == WagsUntilJoy {
+						go startTwiJoy(ponyMdl)
+					}
 				}
 			}
 		}

@@ -47,7 +47,7 @@ Also fix wrong aspect ratio (now 4:3), and tweak font size.
 
 Also largely convert all nanosecond(int) based values to second(float) ones.
 
-- fix wags being counted during intro
++ fix wags being counted during intro
 
 - add gimp layer to bmp export script
 - scale pony art up and then down to smudge it a bit
