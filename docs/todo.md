@@ -49,20 +49,32 @@ Also largely convert all nanosecond(int) based values to second(float) ones.
 
 + fix wags being counted during intro
 
++ scale everything down to pony size by default and add scaling for pony only
+
+Everything is now scaled 1.0 towards native pony image size.
+Also add missing err checks for blit function calls.
+Scaling for pony only, becaus using BlitScaled on texts causes a panic.
+
+- fix current issue of text being misplaced
+  It is not misplaced, X and Y are correct,
+  but it looks wrong due to scaling being impossible.
+  Using BlitScaled on text surfaces causes panics:
+  "Blit combination not supported",
+  which is probably some scary sdl-magic not working.
+  God, help me.
+
 - add gimp layer to bmp export script
+
 - scale pony art up and then down to smudge it a bit
-  do this in the export script !
+  must be done at runtime, to accomodate different resolutions
 - properly position and resize pony art
 
 - add hearts art
 - implement hearts art
 
-- timescale and delta are not used everywhere
-  The timers fully ignore the timescale.
-  time.Since() and co must practically be banned.
-
 - consider wag speed cap (max = as seen in source)
 
+- make texts properly pixelated
 - start 1st bg text line at proper position
   (uppermost visible pixelrow is at Y: 0)
 

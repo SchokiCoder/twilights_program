@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	gfxWindowWidth = 320
-	gfxWindowHeight = 240
+	gfxScale = 2.0
+	gfxStdWindowWidth = 200
+	gfxStdWindowHeight = 150
 	tickrate = 60
 	timescale = 1.0
 )
@@ -40,7 +41,7 @@ const (
 
 const (
 	// pixel / second
-	BgLineVelocity = float64(gfxWindowHeight) * 1.0 / BgLineTravelTime
+	BgLineVelocity = float64(gfxStdWindowHeight) * gfxScale / BgLineTravelTime
 
 	BgLineSpawnTime = BgLineTravelTime / float64(BgMaxLines)
 )
@@ -131,20 +132,43 @@ func (pm *PonyModel) Free() {
 	pm.Tail[1].Free()
 }
 
-func (pm PonyModel) Draw(surface *sdl.Surface) {
-	var rect sdl.Rect
+func (pm PonyModel) Draw(scale float64, surface *sdl.Surface) {
+	var (
+		err  error
+		rect sdl.Rect
+	)
 
-	rect = sdl.Rect {X: pm.X, Y: pm.Y, W: pm.Body.W, H: pm.Body.H}
-	pm.Body.Blit(nil, surface, &rect)
+	rect = sdl.Rect {X: pm.X, Y: pm.Y,
+		W: int32(float64(pm.Body.W) * scale),
+		H: int32(float64(pm.Body.H) * scale)}
+	err = pm.Body.BlitScaled(nil, surface, &rect)
+	if err != nil {
+		panic(err)
+	}
 
-	rect = sdl.Rect {X: pm.X, Y: pm.Y, W: pm.Eye[pm.EyeIdx].W, H: pm.Eye[pm.EyeIdx].H}
-	pm.Eye[pm.EyeIdx].Blit(nil, surface, &rect)
+	rect = sdl.Rect {X: pm.X, Y: pm.Y,
+		W: int32(float64(pm.Eye[pm.EyeIdx].W) * scale),
+		H: int32(float64(pm.Eye[pm.EyeIdx].H) * scale)}
+	err = pm.Eye[pm.EyeIdx].BlitScaled(nil, surface, &rect)
+	if err != nil {
+		panic(err)
+	}
 
-	rect = sdl.Rect {X: pm.X, Y: pm.Y, W: pm.Rump[pm.RumpIdx].W, H: pm.Rump[pm.RumpIdx].H}
-	pm.Rump[pm.RumpIdx].Blit(nil, surface, &rect)
+	rect = sdl.Rect {X: pm.X, Y: pm.Y,
+		W: int32(float64(pm.Rump[pm.RumpIdx].W) * scale),
+		H: int32(float64(pm.Rump[pm.RumpIdx].H) * scale)}
+	err = pm.Rump[pm.RumpIdx].BlitScaled(nil, surface, &rect)
+	if err != nil {
+		panic(err)
+	}
 
-	rect = sdl.Rect {X: pm.X, Y: pm.Y, W: pm.Tail[pm.TailIdx].W, H: pm.Tail[pm.TailIdx].H}
-	pm.Tail[pm.TailIdx].Blit(nil, surface, &rect)
+	rect = sdl.Rect {X: pm.X, Y: pm.Y,
+		W: int32(float64(pm.Tail[pm.TailIdx].W) * scale),
+		H: int32(float64(pm.Tail[pm.TailIdx].H) * scale)}
+	err = pm.Tail[pm.TailIdx].BlitScaled(nil, surface, &rect)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func draw(bgLineYs []float64,
@@ -153,31 +177,43 @@ func draw(bgLineYs []float64,
 	introR [2]sdl.Rect,
 	introS [2]*sdl.Surface,
 	ponyMdl PonyModel,
+	scale float64,
 	surface *sdl.Surface,
-	win *sdl.Window) {
+	win *sdl.Window,
+	winW int32) {
+	var err error
 
 	bgColor := sdl.MapRGB(surface.Format, 49, 229, 184)
 	surface.FillRect(nil, bgColor)
 
 	var rect = sdl.Rect {
-		X: gfxWindowWidth / 2 - bgLine.W / 2,
+		X: winW / 2 - bgLine.W / 2,
 		Y: 0,
-		W: bgLine.W,
-		H: bgLine.H,
+		W: int32(float64(bgLine.W) * scale),
+		H: int32(float64(bgLine.H) * scale),
 	}
 	for i := 0; i < len(bgLineYs); i++ {
 		rect.Y = int32(bgLineYs[i])
-		bgLine.Blit(nil, surface, &rect)
+		err = bgLine.Blit(nil, surface, &rect)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	ponyMdl.Draw(surface)
+	ponyMdl.Draw(gfxScale, surface)
 
 	switch drawIntro {
 	case 2:
-		introS[1].Blit(nil, surface, &introR[1])
+		err = introS[1].Blit(nil, surface, &introR[1])
+		if err != nil {
+			panic(err)
+		}
 		fallthrough
 	case 1:
-		introS[0].Blit(nil, surface, &introR[0])
+		err = introS[0].Blit(nil, surface, &introR[0])
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	win.UpdateSurface()
@@ -263,6 +299,8 @@ func main() {
 		untilBgSpawn float64
 		wags         int
 		win          *sdl.Window
+		winW         int32
+		winH         int32
 	)
 
 	gameActive = false
@@ -291,11 +329,13 @@ confirmation:
 	}
 	defer sdl.Quit()
 
+	winW = int32(float64(gfxStdWindowWidth) * gfxScale)
+	winH = int32(float64(gfxStdWindowHeight) * gfxScale)
 	win, err = sdl.CreateWindow("Twilight's Program",
 		sdl.WINDOWPOS_UNDEFINED,
 		sdl.WINDOWPOS_UNDEFINED,
-		gfxWindowWidth,
-		gfxWindowHeight,
+		winW,
+		winH,
 		sdl.WINDOW_SHOWN)
 	if err != nil {
 		panic(err)
@@ -313,7 +353,8 @@ confirmation:
 	_ = ttf.Init()
 	defer ttf.Quit()
 
-	font, err = ttf.OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 32)
+	font, err = ttf.OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+		20)
 	if err != nil {
 		panic(err)
 	}
@@ -325,14 +366,14 @@ confirmation:
 	introS[1], _ = font.RenderUTF8Solid("DOG", getIntroColor())
 	defer introS[1].Free()
 
-	introR[1].W = introS[1].W
-	introR[1].H = introS[1].H
-	introR[1].X = gfxWindowWidth / 2 - introR[1].W / 2
-	introR[1].Y = gfxWindowHeight / 2 - introR[1].H / 2
+	introR[1].W = int32(float64(introS[1].W) * gfxScale)
+	introR[1].H = int32(float64(introS[1].H) * gfxScale)
+	introR[1].X = winW / 2 - introR[1].W / 2
+	introR[1].Y = winH / 2 - introR[1].H / 2
 
-	introR[0].W = introS[0].W
-	introR[0].H = introS[0].H
-	introR[0].X = gfxWindowWidth / 2 - introR[0].W / 2
+	introR[0].W = int32(float64(introS[0].W) * gfxScale)
+	introR[0].H = int32(float64(introS[0].H) * gfxScale)
+	introR[0].X = winW / 2 - introR[0].W / 2
 	introR[0].Y = introR[1].Y - introR[1].H
 
 	bgText, _ = font.RenderUTF8Solid("wag wag wag wag", getBgTextColor())
@@ -397,8 +438,10 @@ mainloop:
 				introR,
 				introS,
 				ponyMdl,
+				gfxScale,
 				surface,
-				win)
+				win,
+				winW)
 
 			if handleEvents(&gameActive, &ponyMdl, &wags) == false {
 				break mainloop
