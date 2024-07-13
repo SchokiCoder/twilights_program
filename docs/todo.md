@@ -60,12 +60,15 @@ Scaling for pony only, becaus using BlitScaled on texts causes a panic.
 Instead of just blitting surfaces, create and render textures.
 
 + add gfx scaling
++ properly position pony art
+
+Also improve delta calculation, generally use more floats,
+and use renderer.Clear instead of FillRect.
 
 - add gimp layer to bmp export script
 
-- scale pony art up and then down to smudge it a bit
+- scale pony art up and then down to smudge it a bit?
   must be done at runtime, to accomodate different resolutions
-- properly position and resize pony art
 
 - add hearts art
 - implement hearts art

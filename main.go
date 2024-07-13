@@ -13,9 +13,11 @@ import (
 
 const (
 	gfxScale = 3.2
-	gfxWindowWidth = 200
-	gfxWindowHeight = 150
-	tickrate = 60
+	gfxWindowWidth = 200.0
+	gfxWindowHeight = 150.0
+	gfxPonyXPercent = 0.305555555
+	gfxPonyYPercent = 0.222222222
+	tickrate = 60.0
 	timescale = 1.0
 )
 
@@ -25,7 +27,7 @@ in which 1 frame lasts 41_666_666 nanos.
 */
 const (
 	BgLineTravelTime = 0.625
-	BgMaxLines = 4
+	BgMaxLines = 4.0
 
 	IntroDogTime = 1.041666666
 	GameStartTime = IntroDogTime + 1.791666666
@@ -41,9 +43,12 @@ const (
 
 const (
 	// pixel / second
-	BgLineVelocity = float64(gfxWindowHeight) / BgLineTravelTime
+	BgLineVelocity = gfxWindowHeight / BgLineTravelTime
 
-	BgLineSpawnTime = BgLineTravelTime / float64(BgMaxLines)
+	BgLineSpawnTime = BgLineTravelTime / BgMaxLines
+
+	gfxPonyX = gfxWindowWidth * gfxPonyXPercent
+	gfxPonyY = gfxWindowHeight * gfxPonyYPercent
 )
 
 func getBgTextColor() sdl.Color {
@@ -151,8 +156,7 @@ func draw(bgLineYs []float64,
 	win *sdl.Window) {
 
 	renderer.SetDrawColor(49, 229, 184, 255)
-	r := sdl.Rect{X: 0, Y: 0, W: gfxWindowWidth, H: gfxWindowHeight}
-	renderer.FillRect(&r)
+	renderer.Clear()
 
 	bgLine.Rect.X = gfxWindowWidth / 2 - bgLine.Rect.W / 2
 
@@ -284,8 +288,8 @@ confirmation:
 	win, err = sdl.CreateWindow("Twilight's Program",
 		sdl.WINDOWPOS_UNDEFINED,
 		sdl.WINDOWPOS_UNDEFINED,
-		int32(float64(gfxWindowWidth) * gfxScale),
-		int32(float64(gfxWindowHeight) * gfxScale),
+		int32(gfxWindowWidth * gfxScale),
+		int32(gfxWindowHeight * gfxScale),
 		sdl.WINDOW_SHOWN)
 	if err != nil {
 		panic(err)
@@ -301,6 +305,10 @@ confirmation:
 
 	ponyMdl = newPonyModel(renderer)
 	defer ponyMdl.Free()
+
+	poo, brain := gfxPonyX, gfxPonyY // try using directly instead :)
+	ponyMdl.SetX(int32(poo))
+	ponyMdl.SetY(int32(brain))
 
 	_ = ttf.Init()
 	defer ttf.Quit()
@@ -368,12 +376,10 @@ confirmation:
 		}
 	}()
 
-
 mainloop:
 	for {
-		rawDelta := time.Since(lastTick)
-		if rawDelta >= (1_000_000_000 / tickrate) {
-			delta = float64(rawDelta) / float64(1_000_000_000)
+		delta = time.Since(lastTick).Seconds()
+		if delta >= (1.0 / tickrate) {
 			delta *= timescale
 
 			if gameActive {
