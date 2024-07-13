@@ -12,9 +12,8 @@ import (
 )
 
 const (
-	gfxScale = 2.0
-	gfxStdWindowWidth = 200
-	gfxStdWindowHeight = 150
+	gfxWindowWidth = 200
+	gfxWindowHeight = 150
 	tickrate = 60
 	timescale = 1.0
 )
@@ -41,7 +40,7 @@ const (
 
 const (
 	// pixel / second
-	BgLineVelocity = float64(gfxStdWindowHeight) * gfxScale / BgLineTravelTime
+	BgLineVelocity = float64(gfxWindowHeight) / BgLineTravelTime
 
 	BgLineSpawnTime = BgLineTravelTime / float64(BgMaxLines)
 )
@@ -63,62 +62,72 @@ func getIntroColor() sdl.Color {
 }
 
 type PonyModel struct {
-	Body    *sdl.Surface
-	Eye     [3]*sdl.Surface
+	Body    Sprite
+	Eye     [3]Sprite
 	EyeIdx  int
-	Rump    [2]*sdl.Surface
+	Rump    [2]Sprite
 	RumpIdx int
-	Tail    [2]*sdl.Surface
+	Tail    [2]Sprite
 	TailIdx int
-	X       int32
-	Y       int32
 }
 
-func newPonyModel() PonyModel {
-	var err error
+func newPonyModel(renderer *sdl.Renderer) PonyModel {
 	var ret PonyModel
 
-	ret.Body, err = sdl.LoadBMP("pkg/pony_body.bmp")
-	if err != nil {
-		panic(err)
-	}
+	ret.Body = newSprite(renderer)
+	ret.Body.InitFromBMP("pkg/pony_body.bmp")
 
-	ret.Eye[0], err = sdl.LoadBMP("pkg/pony_eye.bmp")
-	if err != nil {
-		panic(err)
-	}
+	ret.Eye[0] = newSprite(renderer)
+	ret.Eye[0].InitFromBMP("pkg/pony_eye.bmp")
 
-	ret.Eye[1], err = sdl.LoadBMP("pkg/pony_eye_blink.bmp")
-	if err != nil {
-		panic(err)
-	}
+	ret.Eye[1] = newSprite(renderer)
+	ret.Eye[1].InitFromBMP("pkg/pony_eye_blink.bmp")
 
-	ret.Eye[2], err = sdl.LoadBMP("pkg/pony_eye_joy.bmp")
-	if err != nil {
-		panic(err)
-	}
+	ret.Eye[2] = newSprite(renderer)
+	ret.Eye[2].InitFromBMP("pkg/pony_eye_joy.bmp")
 
-	ret.Rump[0], err = sdl.LoadBMP("pkg/pony_rump_down.bmp")
-	if err != nil {
-		panic(err)
-	}
+	ret.Rump[0] = newSprite(renderer)
+	ret.Rump[0].InitFromBMP("pkg/pony_rump_down.bmp")
 
-	ret.Rump[1], err = sdl.LoadBMP("pkg/pony_rump_up.bmp")
-	if err != nil {
-		panic(err)
-	}
+	ret.Rump[1] = newSprite(renderer)
+	ret.Rump[1].InitFromBMP("pkg/pony_rump_up.bmp")
 
-	ret.Tail[0], err = sdl.LoadBMP("pkg/pony_tail_down.bmp")
-	if err != nil {
-		panic(err)
-	}
+	ret.Tail[0] = newSprite(renderer)
+	ret.Tail[0].InitFromBMP("pkg/pony_tail_down.bmp")
 
-	ret.Tail[1], err = sdl.LoadBMP("pkg/pony_tail_up.bmp")
-	if err != nil {
-		panic(err)
-	}
+	ret.Tail[1] = newSprite(renderer)
+	ret.Tail[1].InitFromBMP("pkg/pony_tail_up.bmp")
 
 	return ret
+}
+
+func (pm PonyModel) Draw() {
+	pm.Body.Draw()
+	pm.Eye[pm.EyeIdx].Draw()
+	pm.Rump[pm.RumpIdx].Draw()
+	pm.Tail[pm.TailIdx].Draw()
+}
+
+func (pm *PonyModel) SetX(x int32) {
+	pm.Body.Rect.X = x
+	pm.Eye[0].Rect.X = x
+	pm.Eye[1].Rect.X = x
+	pm.Eye[2].Rect.X = x
+	pm.Rump[0].Rect.X = x
+	pm.Rump[1].Rect.X = x
+	pm.Tail[0].Rect.X = x
+	pm.Tail[1].Rect.X = x
+}
+
+func (pm *PonyModel) SetY(y int32) {
+	pm.Body.Rect.Y = y
+	pm.Eye[0].Rect.Y = y
+	pm.Eye[1].Rect.Y = y
+	pm.Eye[2].Rect.Y = y
+	pm.Rump[0].Rect.Y = y
+	pm.Rump[1].Rect.Y = y
+	pm.Tail[0].Rect.Y = y
+	pm.Tail[1].Rect.Y = y
 }
 
 func (pm *PonyModel) Free() {
@@ -132,91 +141,36 @@ func (pm *PonyModel) Free() {
 	pm.Tail[1].Free()
 }
 
-func (pm PonyModel) Draw(scale float64, surface *sdl.Surface) {
-	var (
-		err  error
-		rect sdl.Rect
-	)
-
-	rect = sdl.Rect {X: pm.X, Y: pm.Y,
-		W: int32(float64(pm.Body.W) * scale),
-		H: int32(float64(pm.Body.H) * scale)}
-	err = pm.Body.BlitScaled(nil, surface, &rect)
-	if err != nil {
-		panic(err)
-	}
-
-	rect = sdl.Rect {X: pm.X, Y: pm.Y,
-		W: int32(float64(pm.Eye[pm.EyeIdx].W) * scale),
-		H: int32(float64(pm.Eye[pm.EyeIdx].H) * scale)}
-	err = pm.Eye[pm.EyeIdx].BlitScaled(nil, surface, &rect)
-	if err != nil {
-		panic(err)
-	}
-
-	rect = sdl.Rect {X: pm.X, Y: pm.Y,
-		W: int32(float64(pm.Rump[pm.RumpIdx].W) * scale),
-		H: int32(float64(pm.Rump[pm.RumpIdx].H) * scale)}
-	err = pm.Rump[pm.RumpIdx].BlitScaled(nil, surface, &rect)
-	if err != nil {
-		panic(err)
-	}
-
-	rect = sdl.Rect {X: pm.X, Y: pm.Y,
-		W: int32(float64(pm.Tail[pm.TailIdx].W) * scale),
-		H: int32(float64(pm.Tail[pm.TailIdx].H) * scale)}
-	err = pm.Tail[pm.TailIdx].BlitScaled(nil, surface, &rect)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func draw(bgLineYs []float64,
-	bgLine *sdl.Surface,
+	bgLine Sprite,
 	drawIntro int,
-	introR [2]sdl.Rect,
-	introS [2]*sdl.Surface,
+	intro [2]Sprite,
 	ponyMdl PonyModel,
-	scale float64,
-	surface *sdl.Surface,
-	win *sdl.Window,
-	winW int32) {
-	var err error
+	renderer *sdl.Renderer,
+	win *sdl.Window) {
 
-	bgColor := sdl.MapRGB(surface.Format, 49, 229, 184)
-	surface.FillRect(nil, bgColor)
+	renderer.SetDrawColor(49, 229, 184, 255)
+	r := sdl.Rect{X: 0, Y: 0, W: gfxWindowWidth, H: gfxWindowHeight}
+	renderer.FillRect(&r)
 
-	var rect = sdl.Rect {
-		X: winW / 2 - bgLine.W / 2,
-		Y: 0,
-		W: int32(float64(bgLine.W) * scale),
-		H: int32(float64(bgLine.H) * scale),
-	}
+	bgLine.Rect.X = gfxWindowWidth / 2 - bgLine.Rect.W / 2
+
 	for i := 0; i < len(bgLineYs); i++ {
-		rect.Y = int32(bgLineYs[i])
-		err = bgLine.Blit(nil, surface, &rect)
-		if err != nil {
-			panic(err)
-		}
+		bgLine.Rect.Y = int32(bgLineYs[i])
+		bgLine.Draw()
 	}
 
-	ponyMdl.Draw(gfxScale, surface)
+	ponyMdl.Draw()
 
 	switch drawIntro {
 	case 2:
-		err = introS[1].Blit(nil, surface, &introR[1])
-		if err != nil {
-			panic(err)
-		}
+		intro[1].Draw()
 		fallthrough
 	case 1:
-		err = introS[0].Blit(nil, surface, &introR[0])
-		if err != nil {
-			panic(err)
-		}
+		intro[0].Draw()
 	}
 
-	win.UpdateSurface()
+	renderer.Present()
 }
 
 // Returns whether mainloop should stay active.
@@ -282,7 +236,7 @@ func startTwiJoy(ponyMdl *PonyModel) {
 func main() {
 	var (
 		bgLineYs     []float64
-		bgText       *sdl.Surface
+		bgText       Sprite
 		delta        float64
 		drawIntro    int
 		err          error
@@ -290,17 +244,14 @@ func main() {
 		font         *ttf.Font
 		gameActive   bool
 		input        []byte
-		introR       [2]sdl.Rect
-		introS       [2]*sdl.Surface
+		intro        [2]Sprite
 		lastTick     time.Time
 		ponyMdl      PonyModel
+		renderer     *sdl.Renderer
 		start        time.Time
-		surface      *sdl.Surface
 		untilBgSpawn float64
 		wags         int
 		win          *sdl.Window
-		winW         int32
-		winH         int32
 	)
 
 	gameActive = false
@@ -329,25 +280,23 @@ confirmation:
 	}
 	defer sdl.Quit()
 
-	winW = int32(float64(gfxStdWindowWidth) * gfxScale)
-	winH = int32(float64(gfxStdWindowHeight) * gfxScale)
 	win, err = sdl.CreateWindow("Twilight's Program",
 		sdl.WINDOWPOS_UNDEFINED,
 		sdl.WINDOWPOS_UNDEFINED,
-		winW,
-		winH,
+		gfxWindowWidth,
+		gfxWindowHeight,
 		sdl.WINDOW_SHOWN)
 	if err != nil {
 		panic(err)
 	}
 	defer win.Destroy()
 
-	surface, err = win.GetSurface()
+	renderer, err = sdl.CreateRenderer(win, -1, 0)
 	if err != nil {
 		panic(err)
 	}
 
-	ponyMdl = newPonyModel()
+	ponyMdl = newPonyModel(renderer)
 	defer ponyMdl.Free()
 
 	_ = ttf.Init()
@@ -360,23 +309,22 @@ confirmation:
 	}
 	defer font.Close()
 
-	introS[0], _ = font.RenderUTF8Solid("YOU ARE NOW", getIntroColor())
-	defer introS[0].Free()
+	intro[0] = newSprite(renderer)
+	intro[0].InitFromText("YOU ARE NOW", getIntroColor(), font)
+	defer intro[0].Free()
 
-	introS[1], _ = font.RenderUTF8Solid("DOG", getIntroColor())
-	defer introS[1].Free()
+	intro[1] = newSprite(renderer)
+	intro[1].InitFromText("DOG", getIntroColor(), font)
+	defer intro[1].Free()
 
-	introR[1].W = int32(float64(introS[1].W) * gfxScale)
-	introR[1].H = int32(float64(introS[1].H) * gfxScale)
-	introR[1].X = winW / 2 - introR[1].W / 2
-	introR[1].Y = winH / 2 - introR[1].H / 2
+	intro[1].Rect.X = gfxWindowWidth / 2 - intro[1].Rect.W / 2
+	intro[1].Rect.Y = gfxWindowHeight / 2 - intro[1].Rect.H / 2
 
-	introR[0].W = int32(float64(introS[0].W) * gfxScale)
-	introR[0].H = int32(float64(introS[0].H) * gfxScale)
-	introR[0].X = winW / 2 - introR[0].W / 2
-	introR[0].Y = introR[1].Y - introR[1].H
+	intro[0].Rect.X = gfxWindowWidth / 2 - intro[0].Rect.W / 2
+	intro[0].Rect.Y = intro[1].Rect.Y - intro[1].Rect.H
 
-	bgText, _ = font.RenderUTF8Solid("wag wag wag wag", getBgTextColor())
+	bgText = newSprite(renderer)
+	bgText.InitFromText("wag wag wag wag", getBgTextColor(), font)
 	bgLineYs = append(bgLineYs, 0)
 
 	start = time.Now()
@@ -429,19 +377,16 @@ mainloop:
 				moveBgLines(&bgLineYs,
 					delta,
 					&untilBgSpawn,
-					bgText.H)
+					bgText.Rect.H)
 			}
 
 			draw(bgLineYs[:],
 				bgText,
 				drawIntro,
-				introR,
-				introS,
+				intro,
 				ponyMdl,
-				gfxScale,
-				surface,
-				win,
-				winW)
+				renderer,
+				win)
 
 			if handleEvents(&gameActive, &ponyMdl, &wags) == false {
 				break mainloop

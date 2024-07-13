@@ -55,13 +55,17 @@ Everything is now scaled 1.0 towards native pony image size.
 Also add missing err checks for blit function calls.
 Scaling for pony only, becaus using BlitScaled on texts causes a panic.
 
++ add proper sprites
+
+Instead of just blitting surfaces, create and render textures.
+
 - fix current issue of text being misplaced
   It is not misplaced, X and Y are correct,
   but it looks wrong due to scaling being impossible.
   Using BlitScaled on text surfaces causes panics:
   "Blit combination not supported",
   which is probably some scary sdl-magic not working.
-  God, help me.
+  Maybe creating textures beforehand will solve it ?
 
 - add gimp layer to bmp export script
 
