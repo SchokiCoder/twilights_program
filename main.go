@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	gfxScale = 3.2
 	gfxWindowWidth = 200
 	gfxWindowHeight = 150
 	tickrate = 60
@@ -283,8 +284,8 @@ confirmation:
 	win, err = sdl.CreateWindow("Twilight's Program",
 		sdl.WINDOWPOS_UNDEFINED,
 		sdl.WINDOWPOS_UNDEFINED,
-		gfxWindowWidth,
-		gfxWindowHeight,
+		int32(float64(gfxWindowWidth) * gfxScale),
+		int32(float64(gfxWindowHeight) * gfxScale),
 		sdl.WINDOW_SHOWN)
 	if err != nil {
 		panic(err)
@@ -295,6 +296,8 @@ confirmation:
 	if err != nil {
 		panic(err)
 	}
+
+	renderer.SetLogicalSize(gfxWindowWidth, gfxWindowHeight)
 
 	ponyMdl = newPonyModel(renderer)
 	defer ponyMdl.Free()

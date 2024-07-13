@@ -59,13 +59,7 @@ Scaling for pony only, becaus using BlitScaled on texts causes a panic.
 
 Instead of just blitting surfaces, create and render textures.
 
-- fix current issue of text being misplaced
-  It is not misplaced, X and Y are correct,
-  but it looks wrong due to scaling being impossible.
-  Using BlitScaled on text surfaces causes panics:
-  "Blit combination not supported",
-  which is probably some scary sdl-magic not working.
-  Maybe creating textures beforehand will solve it ?
++ add gfx scaling
 
 - add gimp layer to bmp export script
 
