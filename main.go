@@ -11,142 +11,6 @@ import (
 	"time"
 )
 
-const (
-	gfxScale = 3.2
-	gfxWindowWidth = 200.0
-	gfxWindowHeight = 150.0
-	gfxPonyXPercent = 0.305555555
-	gfxPonyYPercent = 0.222222222
-	tickrate = 60.0
-	timescale = 1.0
-)
-
-/*
-The durations and times are based on the video being 24 frames/second,
-in which 1 frame lasts 41_666_666 nanos.
-*/
-const (
-	BgLineTravelTime = 0.625
-	BgMaxLines = 4.0
-
-	IntroDogTime = 1.041666666
-	GameStartTime = IntroDogTime + 1.791666666
-	IntroLifetime = IntroDogTime + 1.875
-
-	EyeOpenedDuration = 0.208333333
-	EyeClosedDuration = 0.125
-
-	JoyThroughWagsDelay = 0.041666666
-
-	WagsUntilJoy = 5
-)
-
-const (
-	// pixel / second
-	BgLineVelocity = gfxWindowHeight / BgLineTravelTime
-
-	BgLineSpawnTime = BgLineTravelTime / BgMaxLines
-
-	gfxPonyX = gfxWindowWidth * gfxPonyXPercent
-	gfxPonyY = gfxWindowHeight * gfxPonyYPercent
-)
-
-func getBgTextColor() sdl.Color {
-	return sdl.Color {
-		R: 25,
-		G: 255,
-		B: 0,
-	}
-}
-
-func getIntroColor() sdl.Color {
-	return sdl.Color {
-		R: 255,
-		G: 255,
-		B: 255,
-	}
-}
-
-type PonyModel struct {
-	Body    Sprite
-	Eye     [3]Sprite
-	EyeIdx  int
-	Rump    [2]Sprite
-	RumpIdx int
-	Tail    [2]Sprite
-	TailIdx int
-}
-
-func newPonyModel(renderer *sdl.Renderer) PonyModel {
-	var ret PonyModel
-
-	ret.Body = newSprite(renderer)
-	ret.Body.InitFromBMP("pkg/pony_body.bmp")
-
-	ret.Eye[0] = newSprite(renderer)
-	ret.Eye[0].InitFromBMP("pkg/pony_eye.bmp")
-
-	ret.Eye[1] = newSprite(renderer)
-	ret.Eye[1].InitFromBMP("pkg/pony_eye_blink.bmp")
-
-	ret.Eye[2] = newSprite(renderer)
-	ret.Eye[2].InitFromBMP("pkg/pony_eye_joy.bmp")
-
-	ret.Rump[0] = newSprite(renderer)
-	ret.Rump[0].InitFromBMP("pkg/pony_rump_down.bmp")
-
-	ret.Rump[1] = newSprite(renderer)
-	ret.Rump[1].InitFromBMP("pkg/pony_rump_up.bmp")
-
-	ret.Tail[0] = newSprite(renderer)
-	ret.Tail[0].InitFromBMP("pkg/pony_tail_down.bmp")
-
-	ret.Tail[1] = newSprite(renderer)
-	ret.Tail[1].InitFromBMP("pkg/pony_tail_up.bmp")
-
-	return ret
-}
-
-func (pm PonyModel) Draw() {
-	pm.Body.Draw()
-	pm.Eye[pm.EyeIdx].Draw()
-	pm.Rump[pm.RumpIdx].Draw()
-	pm.Tail[pm.TailIdx].Draw()
-}
-
-func (pm *PonyModel) SetX(x int32) {
-	pm.Body.Rect.X = x
-	pm.Eye[0].Rect.X = x
-	pm.Eye[1].Rect.X = x
-	pm.Eye[2].Rect.X = x
-	pm.Rump[0].Rect.X = x
-	pm.Rump[1].Rect.X = x
-	pm.Tail[0].Rect.X = x
-	pm.Tail[1].Rect.X = x
-}
-
-func (pm *PonyModel) SetY(y int32) {
-	pm.Body.Rect.Y = y
-	pm.Eye[0].Rect.Y = y
-	pm.Eye[1].Rect.Y = y
-	pm.Eye[2].Rect.Y = y
-	pm.Rump[0].Rect.Y = y
-	pm.Rump[1].Rect.Y = y
-	pm.Tail[0].Rect.Y = y
-	pm.Tail[1].Rect.Y = y
-}
-
-func (pm *PonyModel) Free() {
-	pm.Body.Free()
-	pm.Eye[0].Free()
-	pm.Eye[1].Free()
-	pm.Eye[2].Free()
-	pm.Rump[0].Free()
-	pm.Rump[1].Free()
-	pm.Tail[0].Free()
-	pm.Tail[1].Free()
-}
-
 // Returns whether to run the app.
 func confirmationPrompt() bool {
 	var input = make([]byte, 2)
@@ -222,7 +86,7 @@ func handleEvents(gameActive *bool, ponyMdl *PonyModel, wags *int) bool {
 					}
 
 					*wags++
-					if *wags == WagsUntilJoy {
+					if *wags == wagsUntilJoy {
 						go startTwiJoy(ponyMdl)
 					}
 				}
@@ -241,21 +105,21 @@ func moveBgLines(bgLineYs *[]float64,
 	*untilBgSpawn -= delta
 	if *untilBgSpawn <= 0 {
 		*bgLineYs = append(*bgLineYs, float64(0 - lineHeight))
-		*untilBgSpawn = BgLineSpawnTime
+		*untilBgSpawn = bgLineSpawnTime
 	}
 
 	for i := 0; i < len(*bgLineYs); i++ {
-		(*bgLineYs)[i] += BgLineVelocity * delta
+		(*bgLineYs)[i] += bgLineVelocity * delta
 	}
 
-	if len(*bgLineYs) > BgMaxLines + 1 {
+	if len(*bgLineYs) > bgMaxLines + 1 {
 		*bgLineYs = (*bgLineYs)[1:]
 	}
 }
 
 func startTwiJoy(ponyMdl *PonyModel) {
 	joyDelayBegin := time.Now()
-	for time.Since(joyDelayBegin).Seconds() * timescale < JoyThroughWagsDelay {}
+	for time.Since(joyDelayBegin).Seconds() * timescale < joyThroughWagsDelay {}
 
 	ponyMdl.EyeIdx = 2
 }
@@ -387,29 +251,29 @@ func main() {
 	bgLineYs = append(bgLineYs, 0)
 
 	start = time.Now()
-	untilBgSpawn = BgLineSpawnTime
+	untilBgSpawn = bgLineSpawnTime
 	drawIntro++
 
 	go func() {
-		for time.Since(start).Seconds() * timescale < IntroDogTime {}
+		for time.Since(start).Seconds() * timescale < introDogTime {}
 		drawIntro++
 	}()
 
 	go func() {
-		for time.Since(start).Seconds() * timescale < GameStartTime {}
+		for time.Since(start).Seconds() * timescale < gameStartTime {}
 		gameActive = true
 	}()
 
 	go func() {
 		var eyeMovement  time.Time
 
-		for time.Since(start).Seconds() * timescale < IntroLifetime {}
+		for time.Since(start).Seconds() * timescale < introLifetime {}
 		eyeMovement = time.Now()
 		drawIntro = 0
 
 		for gameActive && ponyMdl.EyeIdx != 2 {
 			for time.Since(eyeMovement).Seconds() * timescale <
-				EyeOpenedDuration {}
+				eyeOpenedDuration {}
 
 			if ponyMdl.EyeIdx != 2 {
 				ponyMdl.EyeIdx = 1
@@ -417,7 +281,7 @@ func main() {
 			eyeMovement = time.Now()
 
 			for time.Since(eyeMovement).Seconds() * timescale <
-				EyeClosedDuration {}
+				eyeClosedDuration {}
 
 			if ponyMdl.EyeIdx != 2 {
 				ponyMdl.EyeIdx = 0

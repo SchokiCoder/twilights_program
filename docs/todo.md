@@ -92,6 +92,12 @@ trying to at first spawn at the center positions,
 then moving to outer spawn positions.
 Wagging faster means having more hearts maintained on the screen.
 
+### subtasks
+
++ add heart position values
+- add heart que
+- add heart decay
+
 ## tasks
 
 - add gimp-layer-to-bmp-export-script
