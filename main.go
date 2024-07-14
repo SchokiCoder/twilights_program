@@ -147,6 +147,28 @@ func (pm *PonyModel) Free() {
 	pm.Tail[1].Free()
 }
 
+// Returns whether to run the app.
+func confirmationPrompt() bool {
+	var input = make([]byte, 2)
+
+	for {
+		fmt.Printf("run program? (y/n)\n");
+
+		_, err := os.Stdin.Read(input)
+		if err != nil {
+			panic(err)
+		}
+
+		switch input[0] {
+		case 'y':
+			return true
+
+		case 'n':
+			return false
+		}
+	}
+}
+
 func draw(bgLineYs []float64,
 	bgLine Sprite,
 	drawIntro int,
@@ -238,17 +260,58 @@ func startTwiJoy(ponyMdl *PonyModel) {
 	ponyMdl.EyeIdx = 2
 }
 
+// Returns whether mainloop should stay active.
+func tick(bgLineYs   *[]float64,
+	bgText       Sprite,
+	drawIntro    int,
+	gameActive   *bool,
+	intro        [2]Sprite,
+	lastTick     *time.Time,
+	ponyMdl      *PonyModel,
+	renderer     *sdl.Renderer,
+	untilBgSpawn *float64,
+	wags         *int,
+	win          *sdl.Window) bool {
+	var (
+		delta    float64
+	)
+	delta = time.Since(*lastTick).Seconds()
+	if delta >= (1.0 / tickrate) {
+		delta *= timescale
+
+		if *gameActive {
+			moveBgLines(bgLineYs,
+				delta,
+				untilBgSpawn,
+				bgText.Rect.H)
+		}
+
+		draw((*bgLineYs)[:],
+			bgText,
+			drawIntro,
+			intro,
+			*ponyMdl,
+			renderer,
+			win)
+
+		if handleEvents(gameActive, ponyMdl, wags) == false {
+			return false
+		}
+
+		*lastTick = time.Now()
+	}
+
+	return true
+}
+
 func main() {
 	var (
 		bgLineYs     []float64
 		bgText       Sprite
-		delta        float64
 		drawIntro    int
 		err          error
-		eyeMovement  time.Time
 		font         *ttf.Font
 		gameActive   bool
-		input        []byte
 		intro        [2]Sprite
 		lastTick     time.Time
 		ponyMdl      PonyModel
@@ -260,24 +323,9 @@ func main() {
 	)
 
 	gameActive = false
-	input = make([]byte, 2)
 
-confirmation:
-	for {
-		fmt.Printf("run program? (y/n)\n");
-
-		_, err := os.Stdin.Read(input)
-		if err != nil {
-			panic("Cannot read stdin")
-		}
-
-		switch input[0] {
-		case 'y':
-			break confirmation
-
-		case 'n':
-			return
-		}
+	if confirmationPrompt() == false {
+		return
 	}
 
 	if err = sdl.Init(sdl.INIT_EVERYTHING); err != nil {
@@ -353,6 +401,8 @@ confirmation:
 	}()
 
 	go func() {
+		var eyeMovement  time.Time
+
 		for time.Since(start).Seconds() * timescale < IntroLifetime {}
 		eyeMovement = time.Now()
 		drawIntro = 0
@@ -378,30 +428,20 @@ confirmation:
 
 mainloop:
 	for {
-		delta = time.Since(lastTick).Seconds()
-		if delta >= (1.0 / tickrate) {
-			delta *= timescale
+		stayActive := tick(&bgLineYs,
+			bgText,
+			drawIntro,
+			&gameActive,
+			intro,
+			&lastTick,
+			&ponyMdl,
+			renderer,
+			&untilBgSpawn,
+			&wags,
+			win)
 
-			if gameActive {
-				moveBgLines(&bgLineYs,
-					delta,
-					&untilBgSpawn,
-					bgText.Rect.H)
-			}
-
-			draw(bgLineYs[:],
-				bgText,
-				drawIntro,
-				intro,
-				ponyMdl,
-				renderer,
-				win)
-
-			if handleEvents(&gameActive, &ponyMdl, &wags) == false {
-				break mainloop
-			}
-
-			lastTick = time.Now()
+		if stayActive == false {
+			break mainloop
 		}
 	}
 }

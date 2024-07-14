@@ -69,7 +69,7 @@ and use renderer.Clear instead of FillRect.
 
 + add hearts art
 
-## implement hearts art (not started)
+## implement hearts art (wip)
 
 ### Source material observations
 
@@ -110,6 +110,8 @@ Wagging faster means having more hearts maintained on the screen.
 
 - add font outline for intro text
   (the purple outline)
+
+- directly ship with current font ?
 
 - add music ?
   Split track into idle part und action part.
