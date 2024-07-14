@@ -1,5 +1,7 @@
 # basics
 
+## tasks
+
 + add cli
 + add window
 + add proper query loop
@@ -65,13 +67,37 @@ Instead of just blitting surfaces, create and render textures.
 Also improve delta calculation, generally use more floats,
 and use renderer.Clear instead of FillRect.
 
-- add gimp layer to bmp export script
++ add hearts art
+
+## implement hearts art (not started)
+
+### Source material observations
+
+3 set positions around pony, with 2 variants.
+A heart livespan or spawntime seems independent of wags,
+as there is sometimes no delay between spawn and sometimes there is.
+Each heart lives big for 8 or 10 frames and small for 4 or 6 frames.
+A new heart is spawned every 10 or 12 frames.
+It seems all random.
+
+### Implementation
+
+Changing hearts to be feedback for the player doing well would fit better for
+an interactive experience, and would allow me to avoid this randomness of the
+source material.
+2 wags will be required for the spawn of a heart.
+There will be set positions for hearts,
+and heart spawns will be queued for those positions,
+trying to at first spawn at the center positions,
+then moving to outer spawn positions.
+Wagging faster means having more hearts maintained on the screen.
+
+## tasks
+
+- add gimp-layer-to-bmp-export-script
 
 - scale pony art up and then down to smudge it a bit?
   must be done at runtime, to accomodate different resolutions
-
-- add hearts art
-- implement hearts art
 
 - consider wag speed cap (max = as seen in source)
 
