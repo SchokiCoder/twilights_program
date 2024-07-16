@@ -76,7 +76,7 @@ func getHeartPositionPercentages() [8]sdl.FPoint {
 		},
 		sdl.FPoint {
 			X: 0.156944444,
-			Y: 0.675925926,
+			Y: 0.7,
 		},
 		sdl.FPoint {
 			X: 0.74375,
@@ -84,7 +84,7 @@ func getHeartPositionPercentages() [8]sdl.FPoint {
 		},
 		sdl.FPoint {
 			X: 0.672222222,
-			Y: 0.868518519,
+			Y: 0.85,
 		},
 		sdl.FPoint {
 			X: 0.130555556,

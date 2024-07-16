@@ -34,12 +34,13 @@ func confirmationPrompt() bool {
 }
 
 func draw(bgLineYs []float64,
-	bgLine Sprite,
-	drawIntro int,
-	intro [2]Sprite,
-	ponyMdl PonyModel,
-	renderer *sdl.Renderer,
-	win *sdl.Window) {
+	bgLine     Sprite,
+	drawIntro  int,
+	hearts     [2]Sprite,
+	intro      [2]Sprite,
+	ponyMdl    PonyModel,
+	renderer   *sdl.Renderer,
+	win        *sdl.Window) {
 
 	renderer.SetDrawColor(49, 229, 184, 255)
 	renderer.Clear()
@@ -52,6 +53,14 @@ func draw(bgLineYs []float64,
 	}
 
 	ponyMdl.Draw()
+
+	// demo drawing, no que
+	hPos := getHeartPositions()
+	for i := 0; i < len(hPos); i++ {
+		hearts[0].Rect.X = hPos[i].X
+		hearts[0].Rect.Y = hPos[i].Y
+		hearts[0].Draw()
+	}
 
 	switch drawIntro {
 	case 2:
@@ -129,6 +138,7 @@ func tick(bgLineYs   *[]float64,
 	bgText       Sprite,
 	drawIntro    int,
 	gameActive   *bool,
+	hearts       [2]Sprite,
 	intro        [2]Sprite,
 	lastTick     *time.Time,
 	ponyMdl      *PonyModel,
@@ -153,6 +163,7 @@ func tick(bgLineYs   *[]float64,
 		draw((*bgLineYs)[:],
 			bgText,
 			drawIntro,
+			hearts,
 			intro,
 			*ponyMdl,
 			renderer,
@@ -176,6 +187,7 @@ func main() {
 		err          error
 		font         *ttf.Font
 		gameActive   bool
+		hearts       [2]Sprite
 		intro        [2]Sprite
 		lastTick     time.Time
 		ponyMdl      PonyModel
@@ -214,6 +226,14 @@ func main() {
 	}
 
 	renderer.SetLogicalSize(gfxWindowWidth, gfxWindowHeight)
+
+	hearts[0] = newSprite(renderer)
+	hearts[0].InitFromBMP("pkg/heart_big.bmp")
+	defer hearts[0].Free()
+
+	hearts[1] = newSprite(renderer)
+	hearts[1].InitFromBMP("pkg/heart_small.bmp")
+	defer hearts[1].Free()
 
 	ponyMdl = newPonyModel(renderer)
 	defer ponyMdl.Free()
@@ -296,6 +316,7 @@ mainloop:
 			bgText,
 			drawIntro,
 			&gameActive,
+			hearts,
 			intro,
 			&lastTick,
 			&ponyMdl,

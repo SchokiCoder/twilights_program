@@ -95,7 +95,7 @@ Wagging faster means having more hearts maintained on the screen.
 ### subtasks
 
 + add heart position values
-- add heart que
+- add heart spawn que
 - add heart decay
 
 ## tasks
