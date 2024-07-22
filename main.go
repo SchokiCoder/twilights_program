@@ -33,14 +33,15 @@ func confirmationPrompt() bool {
 	}
 }
 
-func draw(bgLineYs []float64,
-	bgLine     Sprite,
-	drawIntro  int,
-	hearts     [2]Sprite,
-	intro      [2]Sprite,
-	ponyMdl    PonyModel,
-	renderer   *sdl.Renderer,
-	win        *sdl.Window) {
+func draw(bgLineYs     []float64,
+	bgLine         Sprite,
+	drawIntro      int,
+	hearts         [2]Sprite,
+	heartLifetimes []float64,
+	intro          [2]Sprite,
+	ponyMdl        PonyModel,
+	renderer       *sdl.Renderer,
+	win            *sdl.Window) {
 
 	renderer.SetDrawColor(49, 229, 184, 255)
 	renderer.Clear()
@@ -54,12 +55,17 @@ func draw(bgLineYs []float64,
 
 	ponyMdl.Draw()
 
-	// demo drawing, no que
 	hPos := getHeartPositions()
-	for i := 0; i < len(hPos); i++ {
-		hearts[0].Rect.X = hPos[i].X
-		hearts[0].Rect.Y = hPos[i].Y
-		hearts[0].Draw()
+	for i := 0; i < len(heartLifetimes); i++ {
+		if heartLifetimes[i] >= heartBigLifetime {
+			hearts[0].Rect.X = hPos[i].X
+			hearts[0].Rect.Y = hPos[i].Y
+			hearts[0].Draw()
+		} else if heartLifetimes[i] > 0.0 {
+			hearts[1].Rect.X = hPos[i].X
+			hearts[1].Rect.Y = hPos[i].Y
+			hearts[1].Draw()
+		}
 	}
 
 	switch drawIntro {
@@ -74,7 +80,10 @@ func draw(bgLineYs []float64,
 }
 
 // Returns whether mainloop should stay active.
-func handleEvents(gameActive *bool, ponyMdl *PonyModel, wags *int) bool {
+func handleEvents(gameActive *bool,
+	heartQue *int,
+	ponyMdl *PonyModel,
+	wags *int) bool {
 	event := sdl.PollEvent()
 
 	for ; event != nil; event = sdl.PollEvent() {
@@ -85,20 +94,7 @@ func handleEvents(gameActive *bool, ponyMdl *PonyModel, wags *int) bool {
 
 		case *sdl.MouseButtonEvent:
 			if event.GetType() == sdl.MOUSEBUTTONDOWN {
-				if *gameActive {
-					if ponyMdl.RumpIdx == 0 {
-						ponyMdl.RumpIdx = 1
-						ponyMdl.TailIdx = 1
-					} else {
-						ponyMdl.RumpIdx = 0
-						ponyMdl.TailIdx = 0
-					}
-
-					*wags++
-					if *wags == wagsUntilJoy {
-						go startTwiJoy(ponyMdl)
-					}
-				}
+				onWag(gameActive, heartQue, ponyMdl, wags)
 			}
 		}
 	}
@@ -126,6 +122,27 @@ func moveBgLines(bgLineYs *[]float64,
 	}
 }
 
+func onWag(gameActive *bool, heartQue *int, ponyMdl *PonyModel, wags *int) {
+	if *gameActive {
+		if ponyMdl.RumpIdx == 0 {
+			ponyMdl.RumpIdx = 1
+			ponyMdl.TailIdx = 1
+		} else {
+			ponyMdl.RumpIdx = 0
+			ponyMdl.TailIdx = 0
+		}
+
+		*wags++
+		if *wags == wagsUntilJoy {
+			go startTwiJoy(ponyMdl)
+		}
+
+		if *wags % wagsForHeart == 0 {
+			*heartQue++
+		}
+	}
+}
+
 func startTwiJoy(ponyMdl *PonyModel) {
 	joyDelayBegin := time.Now()
 	for time.Since(joyDelayBegin).Seconds() * timescale < joyThroughWagsDelay {}
@@ -134,18 +151,20 @@ func startTwiJoy(ponyMdl *PonyModel) {
 }
 
 // Returns whether mainloop should stay active.
-func tick(bgLineYs   *[]float64,
-	bgText       Sprite,
-	drawIntro    int,
-	gameActive   *bool,
-	hearts       [2]Sprite,
-	intro        [2]Sprite,
-	lastTick     *time.Time,
-	ponyMdl      *PonyModel,
-	renderer     *sdl.Renderer,
-	untilBgSpawn *float64,
-	wags         *int,
-	win          *sdl.Window) bool {
+func tick(bgLineYs     *[]float64,
+	bgText         Sprite,
+	drawIntro      int,
+	gameActive     *bool,
+	heartQue       *int,
+	hearts         [2]Sprite,
+	heartLifetimes []float64,
+	intro          [2]Sprite,
+	lastTick       *time.Time,
+	ponyMdl        *PonyModel,
+	renderer       *sdl.Renderer,
+	untilBgSpawn   *float64,
+	wags           *int,
+	win            *sdl.Window) bool {
 	var (
 		delta    float64
 	)
@@ -164,13 +183,23 @@ func tick(bgLineYs   *[]float64,
 			bgText,
 			drawIntro,
 			hearts,
+			heartLifetimes,
 			intro,
 			*ponyMdl,
 			renderer,
 			win)
 
-		if handleEvents(gameActive, ponyMdl, wags) == false {
+		if handleEvents(gameActive, heartQue, ponyMdl, wags) == false {
 			return false
+		}
+
+		for i := 0; i < len(heartLifetimes); i++ {
+			heartLifetimes[i] -= delta
+
+			if heartLifetimes[i] <= 0.0 && *heartQue > 0 {
+				heartLifetimes[i] = heartLifetime
+				*heartQue--
+			}
 		}
 
 		*lastTick = time.Now()
@@ -181,21 +210,23 @@ func tick(bgLineYs   *[]float64,
 
 func main() {
 	var (
-		bgLineYs     []float64
-		bgText       Sprite
-		drawIntro    int
-		err          error
-		font         *ttf.Font
-		gameActive   bool
-		hearts       [2]Sprite
-		intro        [2]Sprite
-		lastTick     time.Time
-		ponyMdl      PonyModel
-		renderer     *sdl.Renderer
-		start        time.Time
-		untilBgSpawn float64
-		wags         int
-		win          *sdl.Window
+		bgLineYs       []float64
+		bgText         Sprite
+		drawIntro      int
+		err            error
+		font           *ttf.Font
+		gameActive     bool
+		heartQue       int
+		hearts         [2]Sprite
+		heartLifetimes [8]float64
+		intro          [2]Sprite
+		lastTick       time.Time
+		ponyMdl        PonyModel
+		renderer       *sdl.Renderer
+		start          time.Time
+		untilBgSpawn   float64
+		wags           int
+		win            *sdl.Window
 	)
 
 	gameActive = false
@@ -316,7 +347,9 @@ mainloop:
 			bgText,
 			drawIntro,
 			&gameActive,
+			&heartQue,
 			hearts,
+			heartLifetimes[:],
 			intro,
 			&lastTick,
 			&ponyMdl,
