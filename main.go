@@ -61,7 +61,7 @@ func draw(bgLineYs     []float64,
 			hearts[0].Rect.X = hPos[i].X
 			hearts[0].Rect.Y = hPos[i].Y
 			hearts[0].Draw()
-		} else if heartLifetimes[i] > 0.0 {
+		} else if heartLifetimes[i] >= heartSmallLifetime {
 			hearts[1].Rect.X = hPos[i].X
 			hearts[1].Rect.Y = hPos[i].Y
 			hearts[1].Draw()

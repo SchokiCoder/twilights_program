@@ -99,6 +99,10 @@ Wagging faster means having more hearts maintained on the screen.
 
 ## tasks
 
++ add a delay for a hearts position to be open for a respawn
+
+This makes it look a bit more random.
+
 - add gimp-layer-to-bmp-export-script
 
 - scale pony art up and then down to smudge it a bit?
