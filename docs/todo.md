@@ -118,6 +118,7 @@ in a language I never used and after that never would again...
 
 Alright, bye XCFs.
 
++ add install script
 - add proper pathfinding for assets
 
 - scale pony art up and then down to smudge it a bit?
