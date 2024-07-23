@@ -259,11 +259,11 @@ func main() {
 	renderer.SetLogicalSize(gfxWindowWidth, gfxWindowHeight)
 
 	hearts[0] = newSprite(renderer)
-	hearts[0].InitFromBMP("pkg/heart_big.bmp")
+	hearts[0].InitFromFile("assets/heart/big.png")
 	defer hearts[0].Free()
 
 	hearts[1] = newSprite(renderer)
-	hearts[1].InitFromBMP("pkg/heart_small.bmp")
+	hearts[1].InitFromFile("assets/heart/small.png")
 	defer hearts[1].Free()
 
 	ponyMdl = newPonyModel(renderer)

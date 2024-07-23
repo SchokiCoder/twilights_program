@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/ttf"
 )
 
@@ -23,10 +24,10 @@ func newSprite(renderer *sdl.Renderer) Sprite {
 	return ret
 }
 
-func (s *Sprite) InitFromBMP(path string) {
+func (s *Sprite) InitFromFile(path string) {
 	var err error
 
-	s.surface, err = sdl.LoadBMP(path)
+	s.surface, err = img.Load(path)
 	if err != nil {
 		panic(err)
 	}

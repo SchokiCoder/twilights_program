@@ -103,7 +103,22 @@ Wagging faster means having more hearts maintained on the screen.
 
 This makes it look a bit more random.
 
-- add gimp-layer-to-bmp-export-script
++ replace XCF files with just PNGs
+
+So I thought of just dropping the XCFs and just having the PNGs outright,
+but there is a reason why everything is layered in one file. Changing one layer
+depends on other layers working with that change. That means
+every time I change something I would have to import every corresponding PNG
+and make it its own layer and- wait, GIMP has that exact funtion... oh.
+
+On the other hoof, I could try to use GIMP's not at all documented scheme API
+for the proper implementation of an export script...
+Hmmm manual export after every change... or undocumented API,
+in a language I never used and after that never would again...
+
+Alright, bye XCFs.
+
+- add proper pathfinding for assets
 
 - scale pony art up and then down to smudge it a bit?
   must be done at runtime, to accomodate different resolutions
@@ -113,9 +128,6 @@ This makes it look a bit more random.
 - make texts properly pixelated
 - start 1st bg text line at proper position
   (uppermost visible pixelrow is at Y: 0)
-
-- add graphics
-  see issue 1
 
 - add font outline for intro text
   (the purple outline)

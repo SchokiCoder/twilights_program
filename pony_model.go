@@ -19,28 +19,28 @@ func newPonyModel(renderer *sdl.Renderer) PonyModel {
 	var ret PonyModel
 
 	ret.Body = newSprite(renderer)
-	ret.Body.InitFromBMP("pkg/pony_body.bmp")
+	ret.Body.InitFromFile("assets/pony/body.png")
 
 	ret.Eye[0] = newSprite(renderer)
-	ret.Eye[0].InitFromBMP("pkg/pony_eye.bmp")
+	ret.Eye[0].InitFromFile("assets/pony/eye.png")
 
 	ret.Eye[1] = newSprite(renderer)
-	ret.Eye[1].InitFromBMP("pkg/pony_eye_blink.bmp")
+	ret.Eye[1].InitFromFile("assets/pony/eye_blink.png")
 
 	ret.Eye[2] = newSprite(renderer)
-	ret.Eye[2].InitFromBMP("pkg/pony_eye_joy.bmp")
+	ret.Eye[2].InitFromFile("assets/pony/eye_joy.png")
 
 	ret.Rump[0] = newSprite(renderer)
-	ret.Rump[0].InitFromBMP("pkg/pony_rump_down.bmp")
+	ret.Rump[0].InitFromFile("assets/pony/rump_down.png")
 
 	ret.Rump[1] = newSprite(renderer)
-	ret.Rump[1].InitFromBMP("pkg/pony_rump_up.bmp")
+	ret.Rump[1].InitFromFile("assets/pony/rump_up.png")
 
 	ret.Tail[0] = newSprite(renderer)
-	ret.Tail[0].InitFromBMP("pkg/pony_tail_down.bmp")
+	ret.Tail[0].InitFromFile("assets/pony/tail_down.png")
 
 	ret.Tail[1] = newSprite(renderer)
-	ret.Tail[1].InitFromBMP("pkg/pony_tail_up.bmp")
+	ret.Tail[1].InitFromFile("assets/pony/tail_up.png")
 
 	return ret
 }
