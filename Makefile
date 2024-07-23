@@ -1,23 +1,28 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2024  Andy Frank Schoknecht
 
-APP_NAME:=twilights_program
+APP_NAME         :=twilights_program
+LICENSE          :=GPL-2.0-or-later
+LICENSE_URL      :=https://www.gnu.org/licenses/gpl-2.0.html
+REPOSITORY       :=https://github.com/SchokiCoder/twilights_program
+VERSION          :=v0.0
+PATH_ASSETS_SYS  :=/usr/share/$(APP_NAME)
+PATH_ASSETS_USER :=$(HOME)/.local/share/$(APP_NAME)
 
-INSTALLDIR_ASSETS:=/usr/share/
-INSTALLDIR_ASSETS:=$(INSTALLDIR_ASSETS)$(APP_NAME)
-INSTALLDIR_BIN:=/usr/local/bin
+INSTALLDIR_ASSETS :=$(PATH_ASSETS_SYS)
+INSTALLDIR_BIN    :=/usr/local/bin
 
 # uncomment for user install
-#INSTALLDIR_ASSETS:=$(HOME)/.local/share/
-#INSTALLDIR_ASSETS:=$(INSTALLDIR_ASSETS)$(APP_NAME)
-#INSTALLDIR_BIN:=$(HOME)/.local/bin
+#INSTALLDIR_ASSETS :=$(PATH_ASSETS_USER)
+#INSTALLDIR_BIN    :=$(HOME)/.local/bin
 
 .PHONY: all build clean vet install uninstall
 
 all: vet build
 
 build:
-	go build
+	go build \
+		-ldflags "-X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepo=$(REPO)' -X 'main.AppVersion=$(VERSION)' -X 'main.PathAssetsSys=$(PATH_ASSETS_SYS)' -X 'main.PathAssetsUser=$(PATH_ASSETS_USER)'"
 
 clean:
 	rm -f $(APP_NAME)

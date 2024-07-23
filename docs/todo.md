@@ -119,7 +119,8 @@ in a language I never used and after that never would again...
 Alright, bye XCFs.
 
 + add install script
-- add proper pathfinding for assets
++ add proper pathfinding for assets
+- add -a --about arg
 
 - scale pony art up and then down to smudge it a bit?
   must be done at runtime, to accomodate different resolutions

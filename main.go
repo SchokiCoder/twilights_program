@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2024  Andy Frank Schoknecht
 
+//go:generate go ./geninfo.go
 package main
 
 import (
@@ -9,6 +10,14 @@ import (
 	"github.com/veandco/go-sdl2/ttf"
 	"os"
 	"time"
+)
+
+var (
+	AppLicense    string
+	AppLicenseUrl string
+	AppName       string
+	AppRepo       string
+	AppVersion    string
 )
 
 // Returns whether to run the app.
@@ -259,11 +268,11 @@ func main() {
 	renderer.SetLogicalSize(gfxWindowWidth, gfxWindowHeight)
 
 	hearts[0] = newSprite(renderer)
-	hearts[0].InitFromFile("assets/heart/big.png")
+	hearts[0].InitFromAsset("heart/big.png")
 	defer hearts[0].Free()
 
 	hearts[1] = newSprite(renderer)
-	hearts[1].InitFromFile("assets/heart/small.png")
+	hearts[1].InitFromAsset("heart/small.png")
 	defer hearts[1].Free()
 
 	ponyMdl = newPonyModel(renderer)
