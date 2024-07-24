@@ -225,7 +225,7 @@ func main() {
 		bgText         Sprite
 		drawIntro      int
 		err            error
-		font           *ttf.Font
+		fonts          [2]*ttf.Font
 		gameActive     bool
 		heartQue       int
 		hearts         [2]Sprite
@@ -307,19 +307,22 @@ func main() {
 	_ = ttf.Init()
 	defer ttf.Quit()
 
-	font, err = ttf.OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
-		20)
-	if err != nil {
-		panic(err)
+	for i := 0; i < len(fonts); i++ {
+		fonts[i], err = ttf.OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+			20)
+		if err != nil {
+			panic(err)
+		}
+		defer fonts[i].Close()
 	}
-	defer font.Close()
+	fonts[1].SetOutline(gfxTextOutlineSize)
 
 	intro[0] = newSprite(renderer)
-	intro[0].InitFromText("YOU ARE NOW", getIntroColor(), font)
+	intro[0].InitFromText("YOU ARE NOW", getIntroColors(), fonts[:])
 	defer intro[0].Free()
 
 	intro[1] = newSprite(renderer)
-	intro[1].InitFromText("DOG", getIntroColor(), font)
+	intro[1].InitFromText("DOG", getIntroColors(), fonts[:])
 	defer intro[1].Free()
 
 	intro[1].Rect.X = gfxWindowWidth / 2 - intro[1].Rect.W / 2
@@ -329,7 +332,9 @@ func main() {
 	intro[0].Rect.Y = intro[1].Rect.Y - intro[1].Rect.H
 
 	bgText = newSprite(renderer)
-	bgText.InitFromText("wag wag wag wag", getBgTextColor(), font)
+	bgText.InitFromText("wag wag wag wag",
+		[]sdl.Color{getBgTextColor()},
+		fonts[:1])
 	bgLineYs = append(bgLineYs, 0)
 
 	start = time.Now()

@@ -14,6 +14,8 @@ const (
 
 	gfxPonyX = gfxWindowWidth * gfxPonyXPercent
 	gfxPonyY = gfxWindowHeight * gfxPonyYPercent
+
+	gfxTextOutlineSize = 1
 )
 
 const (
@@ -66,6 +68,21 @@ func getIntroColor() sdl.Color {
 		R: 255,
 		G: 255,
 		B: 255,
+	}
+}
+
+func getIntroOutlineColor() sdl.Color {
+	return sdl.Color {
+		R: 255,
+		G: 0,
+		B: 255,
+	}
+}
+
+func getIntroColors() []sdl.Color {
+	return []sdl.Color {
+		getIntroColor(),
+		getIntroOutlineColor(),
 	}
 }
 

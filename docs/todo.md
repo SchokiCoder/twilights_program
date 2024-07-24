@@ -1,3 +1,18 @@
+# additional improvements
+
+- scale pony art up and then down to smudge it a bit?
+  must be done at runtime, to accomodate different resolutions
+
+- consider wag speed cap (max = as seen in source)?
+
+- make texts properly pixelated?
+  already are when upscaled...
+
+- add purple shadow to intro text, casted from center of screen
+  I have no idea how to do that.
+  Maybe just cheat by hardwiring a purple tinted version of the texts
+  where they are needed?
+
 # basics
 
 ## tasks
@@ -127,19 +142,17 @@ Also fix first tick's delta being ridiculously high.
 
 + add -a --about arg
 
-- scale pony art up and then down to smudge it a bit?
-  must be done at runtime, to accomodate different resolutions
++ add font outline for intro text
+  (the pink outline)
 
-- consider wag speed cap (max = as seen in source)
+- add startup hearts
 
-- make texts properly pixelated
 - start 1st bg text line at proper position
   (uppermost visible pixelrow is at Y: 0)
 
-- add font outline for intro text
-  (the purple outline)
-
 - directly ship with current font ?
+
+- make heart lifetimes somewhat random?
 
 - add music ?
   Split track into idle part und action part.
@@ -147,5 +160,6 @@ Also fix first tick's delta being ridiculously high.
   before and during the "run program?" confirmation.
   The action part starts as soon as the sdl window is opened.
 
-- compare with source material
-- set version 0.69.0
+- compare with source material to find differences
+
+- set version 1.0.0

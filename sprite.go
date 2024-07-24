@@ -82,14 +82,37 @@ func (s *Sprite) InitFromAsset(assetpath string) {
 	s.Rect.H = s.surface.H
 }
 
-func (s *Sprite) InitFromText(text string, color sdl.Color, font *ttf.Font) {
-	var err error
+func (s *Sprite) InitFromText(text string,
+	colors []sdl.Color,
+	fonts []*ttf.Font) {
+	var (
+		err error
+		allS []*sdl.Surface
+	)
 
-	s.surface, err = font.RenderUTF8Solid(text, color)
-	if err != nil {
-		panic(err)
+	for i := len(fonts) - 1; i >= 0; i-- {
+		temp, err := fonts[i].RenderUTF8Solid(text, colors[i])
+		if err != nil {
+			panic(err)
+		}
+
+		allS = append(allS, temp)
 	}
 
+	for i := len(allS) - 1; i >= 1; i-- {
+		rect := sdl.Rect{
+			X: gfxTextOutlineSize,
+			Y: gfxTextOutlineSize,
+			W: allS[0].W,
+			H: allS[0].H,
+		}
+		err = allS[i].Blit(nil, allS[0], &rect)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	s.surface = allS[0]
 	s.texture, err = s.renderer.CreateTextureFromSurface(s.surface)
 	if err != nil {
 		panic(err)
