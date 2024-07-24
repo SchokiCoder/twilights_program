@@ -22,7 +22,7 @@ all: vet build
 
 build:
 	go build \
-		-ldflags "-X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepo=$(REPO)' -X 'main.AppVersion=$(VERSION)' -X 'main.PathAssetsSys=$(PATH_ASSETS_SYS)' -X 'main.PathAssetsUser=$(PATH_ASSETS_USER)'"
+		-ldflags "-X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepository=$(REPOSITORY)' -X 'main.AppVersion=$(VERSION)' -X 'main.PathAssetsSys=$(PATH_ASSETS_SYS)' -X 'main.PathAssetsUser=$(PATH_ASSETS_USER)'"
 
 clean:
 	rm -f $(APP_NAME)

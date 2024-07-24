@@ -125,7 +125,7 @@ Alright, bye XCFs.
 
 Also fix first tick's delta being ridiculously high.
 
-- add -a --about arg
++ add -a --about arg
 
 - scale pony art up and then down to smudge it a bit?
   must be done at runtime, to accomodate different resolutions

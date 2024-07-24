@@ -16,7 +16,7 @@ var (
 	AppLicense    string
 	AppLicenseUrl string
 	AppName       string
-	AppRepo       string
+	AppRepository string
 	AppVersion    string
 )
 
@@ -242,6 +242,25 @@ func main() {
 	)
 
 	gameActive = false
+
+	for i := 1; i < len(os.Args); i++ {
+		switch os.Args[i] {
+		case "-a":
+			fallthrough
+		case "--about":
+			fmt.Printf("The source code of \"%v\" %v is available, "+
+				"licensed under the %v at:\n"+
+				"%v\n\n"+
+				"If you did not receive a copy of the license, "+
+				"see below:\n"+
+				"%v\n",
+				AppName, AppVersion,
+				AppLicense,
+				AppRepository,
+				AppLicenseUrl)
+			return
+		}
+	}
 
 	if confirmationPrompt() == false {
 		return
