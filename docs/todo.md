@@ -145,7 +145,11 @@ Also fix first tick's delta being ridiculously high.
 + add font outline for intro text
   (the pink outline)
 
-- add startup hearts
++ add startup hearts
+
+Also make the heart lifetime math a ton simpler to read,
+potentially also fixing it.
+I know that NOW it works, the rest doesn't matter.
 
 - start 1st bg text line at proper position
   (uppermost visible pixelrow is at Y: 0)

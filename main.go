@@ -66,11 +66,12 @@ func draw(bgLineYs     []float64,
 
 	hPos := getHeartPositions()
 	for i := 0; i < len(heartLifetimes); i++ {
-		if heartLifetimes[i] >= heartBigLifetime {
+		if heartLifetimes[i] >= heartLifetime - heartBigLifetime {
 			hearts[0].Rect.X = hPos[i].X
 			hearts[0].Rect.Y = hPos[i].Y
 			hearts[0].Draw()
-		} else if heartLifetimes[i] >= heartSmallLifetime {
+		} else if heartLifetimes[i] >= heartLifetime -
+				heartBigLifetime - heartSmallLifetime {
 			hearts[1].Rect.X = hPos[i].X
 			hearts[1].Rect.Y = hPos[i].Y
 			hearts[1].Draw()
@@ -188,6 +189,15 @@ func tick(bgLineYs     *[]float64,
 				delta,
 				untilBgSpawn,
 				bgText.Rect.H)
+
+			for i := 0; i < len(heartLifetimes); i++ {
+				heartLifetimes[i] -= delta
+
+				if heartLifetimes[i] <= 0.0 && *heartQue > 0 {
+					heartLifetimes[i] = heartLifetime
+					*heartQue--
+				}
+			}
 		}
 
 		draw((*bgLineYs)[:],
@@ -202,15 +212,6 @@ func tick(bgLineYs     *[]float64,
 
 		if handleEvents(gameActive, heartQue, ponyMdl, wags) == false {
 			return false
-		}
-
-		for i := 0; i < len(heartLifetimes); i++ {
-			heartLifetimes[i] -= delta
-
-			if heartLifetimes[i] <= 0.0 && *heartQue > 0 {
-				heartLifetimes[i] = heartLifetime
-				*heartQue--
-			}
 		}
 
 		*lastTick = time.Now()
@@ -377,6 +378,8 @@ func main() {
 		}
 	}()
 
+	heartLifetimes[1] = 0.259999999 + 0.041666666
+	heartLifetimes[2] = 0.041666666 + 0.041666666
 	lastTick = time.Now()
 
 mainloop:

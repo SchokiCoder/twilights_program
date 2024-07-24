@@ -41,8 +41,9 @@ const (
 	joyThroughWagsDelay = 0.041666666
 
 	heartBigLifetime = 0.416666666
-	heartSmallLifetime = 0.666666666
-	heartLifetime = 0.833333333
+	heartSmallLifetime = 0.259999999
+	heartGoneLifetime = 0.041666666
+	heartLifetime = heartBigLifetime + heartSmallLifetime + heartGoneLifetime
 
 	wagsForHeart = 2
 	wagsUntilJoy = 5
