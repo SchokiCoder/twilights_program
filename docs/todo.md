@@ -120,6 +120,11 @@ Alright, bye XCFs.
 
 + add install script
 + add proper pathfinding for assets
+
++ add endgame statistics
+
+Also fix first tick's delta being ridiculously high.
+
 - add -a --about arg
 
 - scale pony art up and then down to smudge it a bit?

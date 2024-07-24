@@ -172,14 +172,16 @@ func tick(bgLineYs     *[]float64,
 	ponyMdl        *PonyModel,
 	renderer       *sdl.Renderer,
 	untilBgSpawn   *float64,
+	uptime         *float64,
 	wags           *int,
 	win            *sdl.Window) bool {
 	var (
-		delta    float64
+		delta float64
 	)
 	delta = time.Since(*lastTick).Seconds()
 	if delta >= (1.0 / tickrate) {
 		delta *= timescale
+		*uptime += delta
 
 		if *gameActive {
 			moveBgLines(bgLineYs,
@@ -234,6 +236,7 @@ func main() {
 		renderer       *sdl.Renderer
 		start          time.Time
 		untilBgSpawn   float64
+		uptime         float64
 		wags           int
 		win            *sdl.Window
 	)
@@ -350,6 +353,8 @@ func main() {
 		}
 	}()
 
+	lastTick = time.Now()
+
 mainloop:
 	for {
 		stayActive := tick(&bgLineYs,
@@ -364,6 +369,7 @@ mainloop:
 			&ponyMdl,
 			renderer,
 			&untilBgSpawn,
+			&uptime,
 			&wags,
 			win)
 
@@ -371,4 +377,15 @@ mainloop:
 			break mainloop
 		}
 	}
+
+	hadJoy := func() string {
+		if wags >= wagsUntilJoy {
+			return "All"
+		} else {
+			return "No"
+		}
+	}()
+	fmt.Printf(`Within %.2f seconds, Twiggy wagged %v times.
+%v ponies had joy in the making of this film.
+`, uptime - gameStartTime, wags, hadJoy)
 }
