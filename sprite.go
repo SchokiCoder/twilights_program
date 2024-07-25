@@ -28,19 +28,18 @@ func newSprite(renderer *sdl.Renderer) Sprite {
 
 func (s *Sprite) InitFromAsset(assetpath string) {
 	var (
-		err   error
+		err      error
 		fullpath string
 		pathPrefixes = []string{
-			"./assets",
+			"./images",
 			PathAssetsUser,
 			PathAssetsSys,
 		}
 	)
 
 	fullpath = getFilepathFromPaths(pathPrefixes, assetpath)
-
 	if fullpath == "" {
-		panic(fmt.Sprintf("Asset not found in asset paths: %v\n",
+		panic(fmt.Sprintf("Image not found in asset paths: %v\n",
 			pathPrefixes))
 	}
 

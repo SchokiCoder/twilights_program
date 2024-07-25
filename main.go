@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
+	"github.com/veandco/go-sdl2/mix"
 	"os"
 	"time"
 )
@@ -139,6 +140,108 @@ func handleEvents(gameActive *bool,
 	return true
 }
 
+func initAudio(sounds []*mix.Music) {
+	var err error
+
+	err = mix.Init(0)
+	if err != nil {
+		panic(err)
+	}
+
+	pathPrefixes := []string{
+		"./sounds",
+		PathAssetsUser,
+		PathAssetsSys,
+	}
+	paths := []string{
+		"Mappy - Main Theme.ogg",
+		"Mappy - Bonus Round Fanfare.ogg",
+		"Mappy - Bonus Round.ogg",
+	}
+
+	for i := 0; i < len(paths); i++ {
+		fullpath := getFilepathFromPaths(pathPrefixes, paths[i])
+		if fullpath == "" {
+			panic(fmt.Sprintf("Sound not found in asset paths: %v\n",
+				pathPrefixes))
+		}
+
+		sounds[i], err = mix.LoadMUS(fullpath)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func initGfx(hearts []Sprite,
+	ponyMdl *PonyModel,
+	renderer *sdl.Renderer,
+	win *sdl.Window) {
+
+	hearts[0] = newSprite(renderer)
+	hearts[0].InitFromAsset("heart/big.png")
+
+	hearts[1] = newSprite(renderer)
+	hearts[1].InitFromAsset("heart/small.png")
+
+	*ponyMdl = newPonyModel(renderer)
+
+	poo, brain := gfxPonyX, gfxPonyY // try using directly instead :)
+	ponyMdl.SetX(int32(poo))
+	ponyMdl.SetY(int32(brain))
+}
+
+func initText(bgLineYs *[]float64,
+	bgText         *Sprite,
+	fonts          []*ttf.Font,
+	intro          []Sprite,
+	renderer       *sdl.Renderer) {
+	var err error
+
+	err = ttf.Init()
+	if err != nil {
+		panic(err)
+	}
+
+	pathPrefixes := []string{
+		"./fonts",
+		PathAssetsUser,
+		PathAssetsSys,
+	}
+
+	fullpath := getFilepathFromPaths(pathPrefixes, "DejaVuSansMono.ttf")
+	if fullpath == "" {
+		panic(fmt.Sprintf("Font not found in asset paths: %v\n",
+			pathPrefixes))
+	}
+
+	for i := 0; i < len(fonts); i++ {
+		fonts[i], err = ttf.OpenFont(fullpath, 20)
+		if err != nil {
+			panic(err)
+		}
+	}
+	fonts[1].SetOutline(gfxTextOutlineSize)
+
+	intro[0] = newSprite(renderer)
+	intro[0].InitFromText("YOU ARE NOW", getIntroColors(), fonts[:])
+
+	intro[1] = newSprite(renderer)
+	intro[1].InitFromText("DOG", getIntroColors(), fonts[:])
+
+	intro[1].Rect.X = gfxWindowWidth / 2 - intro[1].Rect.W / 2
+	intro[1].Rect.Y = gfxWindowHeight / 2 - intro[1].Rect.H / 2
+
+	intro[0].Rect.X = gfxWindowWidth / 2 - intro[0].Rect.W / 2
+	intro[0].Rect.Y = intro[1].Rect.Y - intro[1].Rect.H
+
+	*bgText = newSprite(renderer)
+	bgText.InitFromText("wag wag wag wag",
+		[]sdl.Color{getBgTextColor()},
+		fonts[:1])
+	*bgLineYs = append(*bgLineYs, 0)
+}
+
 func moveBgLines(bgLineYs *[]float64,
 	delta float64,
 	untilBgSpawn *float64,
@@ -178,6 +281,41 @@ func onWag(gameActive *bool, heartQue *int, ponyMdl *PonyModel, wags *int) {
 			*heartQue++
 		}
 	}
+}
+
+func quitAudio(sounds []*mix.Music) {
+	for i := 0; i < len(sounds); i++ {
+		sounds[i].Free()
+	}
+
+	mix.Quit()
+}
+
+func quitGfx(hearts []Sprite,
+	ponyMdl     *PonyModel,
+	renderer    *sdl.Renderer) {
+
+	for i := 0; i < len(hearts); i++ {
+		hearts[i].Free()
+	}
+	ponyMdl.Free()
+	renderer.Destroy()
+}
+
+func quitText(bgText *Sprite,
+	fonts        []*ttf.Font,
+	intro        []Sprite,) {
+
+	for i := 0; i < len(intro); i++ {
+		intro[i].Free()
+	}
+	bgText.Free()
+
+	for i := 0; i < len(fonts); i++ {
+		fonts[i].Close()
+	}
+
+	ttf.Quit()
 }
 
 func startTwiJoy(ponyMdl *PonyModel) {
@@ -262,6 +400,7 @@ func main() {
 		lastTick       time.Time
 		ponyMdl        PonyModel
 		renderer       *sdl.Renderer
+		//sounds         [3]*mix.Music
 		start          time.Time
 		untilBgSpawn   float64
 		uptime         float64
@@ -294,7 +433,8 @@ func main() {
 		return
 	}
 
-	if err = sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+	err = sdl.Init(sdl.INIT_EVERYTHING)
+	if err != nil {
 		panic(err)
 	}
 	defer sdl.Quit()
@@ -317,63 +457,22 @@ func main() {
 
 	renderer.SetLogicalSize(gfxWindowWidth, gfxWindowHeight)
 
-	hearts[0] = newSprite(renderer)
-	hearts[0].InitFromAsset("heart/big.png")
-	defer hearts[0].Free()
+	initGfx(hearts[:], &ponyMdl, renderer, win)
+	defer quitGfx(hearts[:], &ponyMdl, renderer)
 
-	hearts[1] = newSprite(renderer)
-	hearts[1].InitFromAsset("heart/small.png")
-	defer hearts[1].Free()
+	initText(&bgLineYs, &bgText, fonts[:], intro[:], renderer)
+	defer quitText(&bgText, fonts[:], intro[:])
 
-	ponyMdl = newPonyModel(renderer)
-	defer ponyMdl.Free()
+	//initAudio(sounds[:])
+	//defer quitAudio(sounds[:])
 
-	poo, brain := gfxPonyX, gfxPonyY // try using directly instead :)
-	ponyMdl.SetX(int32(poo))
-	ponyMdl.SetY(int32(brain))
-
-	_ = ttf.Init()
-	defer ttf.Quit()
-
-	pathPrefixes := []string{
-			"./fonts",
-			PathAssetsUser,
-			PathAssetsSys,
-	}
-	fullpath := getFilepathFromPaths(pathPrefixes, "DejaVuSansMono.ttf")
-
-	for i := 0; i < len(fonts); i++ {
-		fonts[i], err = ttf.OpenFont(fullpath, 20)
-		if err != nil {
-			panic(err)
-		}
-		defer fonts[i].Close()
-	}
-	fonts[1].SetOutline(gfxTextOutlineSize)
-
-	intro[0] = newSprite(renderer)
-	intro[0].InitFromText("YOU ARE NOW", getIntroColors(), fonts[:])
-	defer intro[0].Free()
-
-	intro[1] = newSprite(renderer)
-	intro[1].InitFromText("DOG", getIntroColors(), fonts[:])
-	defer intro[1].Free()
-
-	intro[1].Rect.X = gfxWindowWidth / 2 - intro[1].Rect.W / 2
-	intro[1].Rect.Y = gfxWindowHeight / 2 - intro[1].Rect.H / 2
-
-	intro[0].Rect.X = gfxWindowWidth / 2 - intro[0].Rect.W / 2
-	intro[0].Rect.Y = intro[1].Rect.Y - intro[1].Rect.H
-
-	bgText = newSprite(renderer)
-	bgText.InitFromText("wag wag wag wag",
-		[]sdl.Color{getBgTextColor()},
-		fonts[:1])
-	bgLineYs = append(bgLineYs, 0)
+	heartLifetimes[1] = 0.259999999 + 0.041666666
+	heartLifetimes[2] = 0.041666666 + 0.041666666
+	drawIntro++
 
 	start = time.Now()
+	lastTick = time.Now()
 	untilBgSpawn = bgLineSpawnTime
-	drawIntro++
 
 	go func() {
 		for time.Since(start).Seconds() * timescale < introDogTime {}
@@ -410,10 +509,6 @@ func main() {
 			eyeMovement = time.Now()
 		}
 	}()
-
-	heartLifetimes[1] = 0.259999999 + 0.041666666
-	heartLifetimes[2] = 0.041666666 + 0.041666666
-	lastTick = time.Now()
 
 mainloop:
 	for {

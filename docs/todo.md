@@ -153,16 +153,20 @@ I know that NOW it works, the rest doesn't matter.
 
 + add DejaVuSansMono directly
 
-- start 1st bg text line at proper position
-  (uppermost visible pixelrow is at Y: 0)
+- add copyright notice for DejaVuSansMono to -a --about
 
-- make heart lifetimes somewhat random?
-
-- add music ?
+- add music
   Split track into idle part und action part.
   The idle part plays as soon as the app starts,
   before and during the "run program?" confirmation.
   The action part starts as soon as the sdl window is opened.
+
+Also add copyright notice for tracks to -a --about
+
+- make heart lifetimes somewhat random?
+
+- start 1st bg text line at proper position
+  (uppermost visible pixelrow is at Y: 0)
 
 - compare with source material to find differences
 

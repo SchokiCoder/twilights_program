@@ -35,6 +35,7 @@ install: build
 	mkdir $(INSTALLDIR_ASSETS)
 	cp -r assets/* $(INSTALLDIR_ASSETS)/
 	cp fonts/* $(INSTALLDIR_ASSETS)/
+	cp sounds/* $(INSTALLDIR_ASSETS)/
 
 uninstall:
 	rm $(INSTALLDIR_BIN)/$(APP_NAME)
