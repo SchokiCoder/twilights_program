@@ -151,10 +151,10 @@ Also make the heart lifetime math a ton simpler to read,
 potentially also fixing it.
 I know that NOW it works, the rest doesn't matter.
 
++ add DejaVuSansMono directly
+
 - start 1st bg text line at proper position
   (uppermost visible pixelrow is at Y: 0)
-
-- directly ship with current font ?
 
 - make heart lifetimes somewhat random?
 

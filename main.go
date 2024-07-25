@@ -5,6 +5,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
@@ -18,6 +19,9 @@ var (
 	AppName       string
 	AppRepository string
 	AppVersion    string
+
+	PathAssetsSys  string
+	PathAssetsUser string
 )
 
 // Returns whether to run the app.
@@ -87,6 +91,29 @@ func draw(bgLineYs     []float64,
 	}
 
 	renderer.Present()
+}
+
+func getFilepathFromPaths(pathPrefixes []string, path string) string {
+	var fullpath string
+
+	for i := 0; i < len(pathPrefixes); i++ {
+		fullpath = pathPrefixes[i] + "/" + path
+
+		f, err := os.Open(fullpath)
+		defer f.Close()
+
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		} else if err != nil {
+			fmt.Fprintf(os.Stderr,
+				"File could not be opened: \"%v\", \"%v\"\n",
+				fullpath, err)
+		} else {
+			return fullpath
+		}
+	}
+
+	return ""
 }
 
 // Returns whether mainloop should stay active.
@@ -308,9 +335,15 @@ func main() {
 	_ = ttf.Init()
 	defer ttf.Quit()
 
+	pathPrefixes := []string{
+			"./fonts",
+			PathAssetsUser,
+			PathAssetsSys,
+	}
+	fullpath := getFilepathFromPaths(pathPrefixes, "DejaVuSansMono.ttf")
+
 	for i := 0; i < len(fonts); i++ {
-		fonts[i], err = ttf.OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
-			20)
+		fonts[i], err = ttf.OpenFont(fullpath, 20)
 		if err != nil {
 			panic(err)
 		}
