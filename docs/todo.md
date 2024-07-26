@@ -161,6 +161,11 @@ I know that NOW it works, the rest doesn't matter.
 
 Also add copyright notices to "--about" for font and music files.
 
++ fix bonus round track not playing
+
+Also fix install not copying images.
+Also set main theme to loop.
+
 - make heart lifetimes somewhat random?
 
 - start 1st bg text line at proper position

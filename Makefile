@@ -33,7 +33,7 @@ vet:
 install: build
 	cp $(APP_NAME) $(INSTALLDIR_BIN)/
 	mkdir $(INSTALLDIR_ASSETS)
-	cp -r assets/* $(INSTALLDIR_ASSETS)/
+	cp -r images/* $(INSTALLDIR_ASSETS)/
 	cp fonts/* $(INSTALLDIR_ASSETS)/
 	cp sounds/* $(INSTALLDIR_ASSETS)/
 

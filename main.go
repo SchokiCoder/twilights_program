@@ -406,6 +406,7 @@ func main() {
 		heartLifetimes [8]float64
 		intro          [2]Sprite
 		lastTick       time.Time
+		mainloopActive bool
 		ponyMdl        PonyModel
 		renderer       *sdl.Renderer
 		sounds         [4]*mix.Music
@@ -416,6 +417,7 @@ func main() {
 		win            *sdl.Window
 	)
 
+	mainloopActive = true
 	gameActive = false
 
 	for i := 1; i < len(os.Args); i++ {
@@ -454,7 +456,7 @@ func main() {
 	initAudio(sounds[:])
 	defer quitAudio(sounds[:])
 
-	sounds[0].Play(0)
+	sounds[0].Play(-1)
 
 	if confirmationPrompt() == false {
 		return
@@ -532,14 +534,13 @@ func main() {
 
 	go func() {
 		for gameActive == false {}
-		if gameActive == false {
+		if mainloopActive {
 			sounds[2].Play(0)
 		}
 	}()
 
-mainloop:
-	for {
-		stayActive := tick(&bgLineYs,
+	for mainloopActive {
+		mainloopActive = tick(&bgLineYs,
 			bgText,
 			drawIntro,
 			&gameActive,
@@ -554,10 +555,6 @@ mainloop:
 			&uptime,
 			&wags,
 			win)
-
-		if stayActive == false {
-			break mainloop
-		}
 	}
 
 	sounds[3].Play(0)
