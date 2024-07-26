@@ -148,6 +148,11 @@ func initAudio(sounds []*mix.Music) {
 		panic(err)
 	}
 
+	err = mix.OpenAudio(48000, sdl.AUDIO_S16, 2, 4096)
+	if err != nil {
+		panic(err)
+	}
+
 	pathPrefixes := []string{
 		"./sounds",
 		PathAssetsUser,
@@ -288,6 +293,8 @@ func quitAudio(sounds []*mix.Music) {
 		sounds[i].Free()
 	}
 
+	mix.CloseAudio()
+
 	mix.Quit()
 }
 
@@ -400,7 +407,7 @@ func main() {
 		lastTick       time.Time
 		ponyMdl        PonyModel
 		renderer       *sdl.Renderer
-		//sounds         [3]*mix.Music
+		sounds         [3]*mix.Music
 		start          time.Time
 		untilBgSpawn   float64
 		uptime         float64
@@ -429,15 +436,22 @@ func main() {
 		}
 	}
 
-	if confirmationPrompt() == false {
-		return
-	}
-
 	err = sdl.Init(sdl.INIT_EVERYTHING)
 	if err != nil {
 		panic(err)
 	}
 	defer sdl.Quit()
+
+	initAudio(sounds[:])
+	defer quitAudio(sounds[:])
+
+	sounds[0].Play(0)
+
+	if confirmationPrompt() == false {
+		return
+	}
+
+	sounds[1].Play(0)
 
 	win, err = sdl.CreateWindow("Twilight's Program",
 		sdl.WINDOWPOS_UNDEFINED,
@@ -462,9 +476,6 @@ func main() {
 
 	initText(&bgLineYs, &bgText, fonts[:], intro[:], renderer)
 	defer quitText(&bgText, fonts[:], intro[:])
-
-	//initAudio(sounds[:])
-	//defer quitAudio(sounds[:])
 
 	heartLifetimes[1] = 0.259999999 + 0.041666666
 	heartLifetimes[2] = 0.041666666 + 0.041666666
@@ -508,6 +519,11 @@ func main() {
 			}
 			eyeMovement = time.Now()
 		}
+	}()
+
+	go func() {
+		for gameActive == false {}
+		sounds[2].Play(0)
 	}()
 
 mainloop:

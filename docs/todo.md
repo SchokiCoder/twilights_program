@@ -153,8 +153,6 @@ I know that NOW it works, the rest doesn't matter.
 
 + add DejaVuSansMono directly
 
-- add copyright notice for DejaVuSansMono to -a --about
-
 - add music
   Split track into idle part und action part.
   The idle part plays as soon as the app starts,
@@ -162,6 +160,8 @@ I know that NOW it works, the rest doesn't matter.
   The action part starts as soon as the sdl window is opened.
 
 Also add copyright notice for tracks to -a --about
+
+- add copyright notice for DejaVuSansMono to -a --about
 
 - make heart lifetimes somewhat random?
 
