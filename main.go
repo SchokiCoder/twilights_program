@@ -162,6 +162,7 @@ func initAudio(sounds []*mix.Music) {
 		"Mappy - Main Theme.ogg",
 		"Mappy - Bonus Round Fanfare.ogg",
 		"Mappy - Bonus Round.ogg",
+		"Mappy - Round Clear.ogg",
 	}
 
 	for i := 0; i < len(paths); i++ {
@@ -407,7 +408,7 @@ func main() {
 		lastTick       time.Time
 		ponyMdl        PonyModel
 		renderer       *sdl.Renderer
-		sounds         [3]*mix.Music
+		sounds         [4]*mix.Music
 		start          time.Time
 		untilBgSpawn   float64
 		uptime         float64
@@ -422,7 +423,15 @@ func main() {
 		case "-a":
 			fallthrough
 		case "--about":
-			fmt.Printf("The source code of \"%v\" %v is available, "+
+			fmt.Printf("The sound files used are not created by me.\n"+
+				"They have been composed by Nobuyuki Ohnogi, "+
+				"for \"Mappy\", developed by Namco in 1983.\n"+
+				"\n"+
+				"The font used \"DejaVuSansMono\" is not mine.\n"+
+				"For more info visit:\n"+
+				"https://dejavu-fonts.github.io.\n"+
+				"\n"+
+				"The source code of \"%v\" %v is available, "+
 				"licensed under the %v at:\n"+
 				"%v\n\n"+
 				"If you did not receive a copy of the license, "+
@@ -523,7 +532,9 @@ func main() {
 
 	go func() {
 		for gameActive == false {}
-		sounds[2].Play(0)
+		if gameActive == false {
+			sounds[2].Play(0)
+		}
 	}()
 
 mainloop:
@@ -549,6 +560,8 @@ mainloop:
 		}
 	}
 
+	sounds[3].Play(0)
+
 	hadJoy := func() string {
 		if wags >= wagsUntilJoy {
 			return "All"
@@ -559,4 +572,6 @@ mainloop:
 	fmt.Printf(`Within %.2f seconds, Twiggy wagged %v times.
 %v ponies had joy in the making of this film.
 `, uptime - gameStartTime, wags, hadJoy)
+
+	for mix.PlayingMusic() {}
 }

@@ -153,15 +153,13 @@ I know that NOW it works, the rest doesn't matter.
 
 + add DejaVuSansMono directly
 
-- add music
++ add music
   Split track into idle part und action part.
   The idle part plays as soon as the app starts,
   before and during the "run program?" confirmation.
   The action part starts as soon as the sdl window is opened.
 
-Also add copyright notice for tracks to -a --about
-
-- add copyright notice for DejaVuSansMono to -a --about
+Also add copyright notices to "--about" for font and music files.
 
 - make heart lifetimes somewhat random?
 
