@@ -187,9 +187,9 @@ Also increase font size to match original.
 Also increase duration constants readability,
 and add heart counter to end game score.
 
-- compare with source material to find differences
++ add demonstrational gif to README
 
-- add demonstrational gif to README
+Also update README's build dependencies.
 
 - test build, install and run on different device
 
