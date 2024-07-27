@@ -1,5 +1,8 @@
 # additional improvements
 
+- make heart lifetimes somewhat random?
+  possible, but adds quite some complexity for little visual difference
+
 - scale pony art up and then down to smudge it a bit?
   must be done at runtime, to accomodate different resolutions
 
@@ -166,11 +169,20 @@ Also add copyright notices to "--about" for font and music files.
 Also fix install not copying images.
 Also set main theme to loop.
 
-- make heart lifetimes somewhat random?
++ change 1st bg text line to be at proper position
 
-- start 1st bg text line at proper position
-  (uppermost visible pixelrow is at Y: 0)
+(Uppermost visible pixelrow's Y is at 0.)
+Also increase font size to match original.
+
+- change tail'n'rump start position to match original
+
+- the source's bg text also had an issue, in which every 4 lines the Y offset
+  between lines is too small
 
 - compare with source material to find differences
 
+- add demonstrational gif to README
+
 - set version 1.0.0
+
+- flatpak ??

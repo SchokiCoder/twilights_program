@@ -15,7 +15,9 @@ const (
 	gfxPonyX = gfxWindowWidth * gfxPonyXPercent
 	gfxPonyY = gfxWindowHeight * gfxPonyYPercent
 
+	gfxFontSize = 22
 	gfxTextOutlineSize = 1
+	gfxFirstBgLineYOffset = -9
 )
 
 const (

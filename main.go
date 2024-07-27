@@ -222,7 +222,7 @@ func initText(bgLineYs *[]float64,
 	}
 
 	for i := 0; i < len(fonts); i++ {
-		fonts[i], err = ttf.OpenFont(fullpath, 20)
+		fonts[i], err = ttf.OpenFont(fullpath, gfxFontSize)
 		if err != nil {
 			panic(err)
 		}
@@ -245,7 +245,7 @@ func initText(bgLineYs *[]float64,
 	bgText.InitFromText("wag wag wag wag",
 		[]sdl.Color{getBgTextColor()},
 		fonts[:1])
-	*bgLineYs = append(*bgLineYs, 0)
+	*bgLineYs = append(*bgLineYs, gfxFirstBgLineYOffset)
 }
 
 func moveBgLines(bgLineYs *[]float64,
