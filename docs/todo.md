@@ -181,9 +181,17 @@ Also increase font size to match original.
 
 + change tail'n'rump start position to match original
 
++ tweak heart lifetimes and spawn requirement to align more with original
+  (original (wag ever 0.125 s, could barely maintain 2 hearts)
+
+Also increase duration constants readability,
+and add heart counter to end game score.
+
 - compare with source material to find differences
 
 - add demonstrational gif to README
+
+- test build, install and run on different device
 
 - set version 1.0.0
 

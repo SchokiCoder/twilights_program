@@ -119,6 +119,7 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 
 // Returns whether mainloop should stay active.
 func handleEvents(gameActive *bool,
+	heartCount *int,
 	heartQue *int,
 	ponyMdl *PonyModel,
 	wags *int) bool {
@@ -132,7 +133,11 @@ func handleEvents(gameActive *bool,
 
 		case *sdl.MouseButtonEvent:
 			if event.GetType() == sdl.MOUSEBUTTONDOWN {
-				onWag(gameActive, heartQue, ponyMdl, wags)
+				onWag(gameActive,
+					heartCount,
+					heartQue,
+					ponyMdl,
+					wags)
 			}
 		}
 	}
@@ -263,12 +268,17 @@ func moveBgLines(bgLineYs *[]float64,
 		(*bgLineYs)[i] += bgLineVelocity * delta
 	}
 
-	if len(*bgLineYs) > bgMaxLines + 1 {
+	if len(*bgLineYs) > gfxBgMaxLines + 1 {
 		*bgLineYs = (*bgLineYs)[1:]
 	}
 }
 
-func onWag(gameActive *bool, heartQue *int, ponyMdl *PonyModel, wags *int) {
+func onWag(gameActive *bool,
+	heartCount    *int,
+	heartQue      *int,
+	ponyMdl       *PonyModel,
+	wags          *int) {
+
 	if *gameActive {
 		if ponyMdl.RumpIdx == 0 {
 			ponyMdl.RumpIdx = 1
@@ -283,7 +293,8 @@ func onWag(gameActive *bool, heartQue *int, ponyMdl *PonyModel, wags *int) {
 			go startTwiJoy(ponyMdl)
 		}
 
-		if *wags % wagsForHeart == 0 {
+		if int(float64(*wags) / wagsForHeart) > *heartCount {
+			*heartCount++
 			*heartQue++
 		}
 	}
@@ -338,6 +349,7 @@ func tick(bgLineYs     *[]float64,
 	bgText         Sprite,
 	drawIntro      int,
 	gameActive     *bool,
+	heartCount     *int,
 	heartQue       *int,
 	hearts         [2]Sprite,
 	heartLifetimes []float64,
@@ -383,7 +395,11 @@ func tick(bgLineYs     *[]float64,
 			renderer,
 			win)
 
-		if handleEvents(gameActive, heartQue, ponyMdl, wags) == false {
+		if handleEvents(gameActive,
+			heartCount,
+			heartQue,
+			ponyMdl,
+			wags) == false {
 			return false
 		}
 
@@ -401,6 +417,7 @@ func main() {
 		err            error
 		fonts          [2]*ttf.Font
 		gameActive     bool
+		heartCount     int
 		heartQue       int
 		hearts         [2]Sprite
 		heartLifetimes [8]float64
@@ -488,8 +505,8 @@ func main() {
 	initText(&bgLineYs, &bgText, fonts[:], intro[:], renderer)
 	defer quitText(&bgText, fonts[:], intro[:])
 
-	heartLifetimes[1] = 0.259999999 + 0.041666666
-	heartLifetimes[2] = 0.041666666 + 0.041666666
+	heartLifetimes[1] = heartLifetime
+	heartLifetimes[2] = heartLifetime - heartBigLifetime - 0.001
 	drawIntro++
 
 	start = time.Now()
@@ -539,11 +556,31 @@ func main() {
 		}
 	}()
 
+	// autoclicker matching original wagspeed
+	/*go func() {
+		var lastWag time.Time
+
+		for gameActive == false {}
+
+		lastWag = time.Now()
+		for gameActive {
+			if time.Since(lastWag).Seconds() * timescale > (1.0 / 24.0 * 3.0) {
+				onWag(&gameActive,
+					&heartCount,
+					&heartQue,
+					&ponyMdl,
+					&wags)
+				lastWag = time.Now()
+			}
+		}
+	}()*/
+
 	for mainloopActive {
 		mainloopActive = tick(&bgLineYs,
 			bgText,
 			drawIntro,
 			&gameActive,
+			&heartCount,
 			&heartQue,
 			hearts,
 			heartLifetimes[:],
@@ -566,9 +603,11 @@ func main() {
 			return "No"
 		}
 	}()
-	fmt.Printf(`Within %.2f seconds, Twiggy wagged %v times.
+	fmt.Printf(`Within %.2f seconds,
+Twiggy wagged %v times,
+and produced %v hearts of joy.
 %v ponies had joy in the making of this film.
-`, uptime - gameStartTime, wags, hadJoy)
+`, uptime - gameStartTime, wags, heartCount, hadJoy)
 
 	for mix.PlayingMusic() {}
 }

@@ -18,6 +18,7 @@ const (
 	gfxFontSize = 22
 	gfxTextOutlineSize = 1
 	gfxFirstBgLineYOffset = -9
+	gfxBgMaxLines = 4.0
 )
 
 const (
@@ -25,29 +26,27 @@ const (
 	timescale = 1.0
 )
 
-/*
-The durations and times are based on the video being 24 frames/second,
-in which 1 frame lasts 41_666_666 nanos.
-*/
+// The durations and times are based on the video being 24 frames/second.
 const (
-	bgLineTravelTime = 0.625
-	bgMaxLines = 4.0
+	bgLineTravelTime = 1.0 / 24.0 * 15.0
 
-	introDogTime = 1.041666666
-	gameStartTime = introDogTime + 1.791666666
-	introLifetime = introDogTime + 1.875
+	introDogTime = 1.0 / 24.0 * 25.0
+	gameStartTime = introDogTime + (1.0 / 24.0 * 43.0)
+	introLifetime = introDogTime + (1.0 / 24.0 * 45.0)
 
-	eyeOpenedDuration = 0.208333333
-	eyeClosedDuration = 0.125
+	eyeOpenedDuration = 1.0 / 24.0 * 5.0
+	eyeClosedDuration = 1.0 / 24.0 * 3.0
 
-	joyThroughWagsDelay = 0.041666666
+	joyThroughWagsDelay = 1.0 / 24.0 * 10.0
 
-	heartBigLifetime = 0.416666666
-	heartSmallLifetime = 0.259999999
-	heartGoneLifetime = 0.041666666
+	heartBigLifetime = 1.0 / 24.0 * 10.0
+	heartSmallLifetime = 1.0 / 24.0 * 4.0
+	heartGoneLifetime = 1.0 / 24.0 * 6.0
 	heartLifetime = heartBigLifetime + heartSmallLifetime + heartGoneLifetime
+)
 
-	wagsForHeart = 2
+const (
+	wagsForHeart = 2.5
 	wagsUntilJoy = 5
 )
 
@@ -55,7 +54,7 @@ const (
 	// pixel / second
 	bgLineVelocity = gfxWindowHeight / bgLineTravelTime
 
-	bgLineSpawnTime = bgLineTravelTime / bgMaxLines
+	bgLineSpawnTime = bgLineTravelTime / gfxBgMaxLines
 )
 
 func getBgTextColor() sdl.Color {
