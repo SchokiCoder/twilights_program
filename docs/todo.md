@@ -16,6 +16,11 @@
   Maybe just cheat by hardwiring a purple tinted version of the texts
   where they are needed?
 
+- the source's bg text also had an issue, in which every 4 lines the Y offset
+  between lines is too small,
+  but recreating this barely notable inconsistency
+  on purpose adds complexity that I am not too fond of
+
 # basics
 
 ## tasks
@@ -174,10 +179,7 @@ Also set main theme to loop.
 (Uppermost visible pixelrow's Y is at 0.)
 Also increase font size to match original.
 
-- change tail'n'rump start position to match original
-
-- the source's bg text also had an issue, in which every 4 lines the Y offset
-  between lines is too small
++ change tail'n'rump start position to match original
 
 - compare with source material to find differences
 

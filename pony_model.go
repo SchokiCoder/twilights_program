@@ -42,6 +42,9 @@ func newPonyModel(renderer *sdl.Renderer) PonyModel {
 	ret.Tail[1] = newSprite(renderer)
 	ret.Tail[1].InitFromAsset("pony/tail_up.png")
 
+	ret.RumpIdx = 1
+	ret.TailIdx = 1
+
 	return ret
 }
 
