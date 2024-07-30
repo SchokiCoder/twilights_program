@@ -3,7 +3,10 @@
 
 package main
 
-import "github.com/veandco/go-sdl2/sdl"
+import (
+	"path/filepath"
+	"github.com/veandco/go-sdl2/sdl"
+)
 
 type PonyModel struct {
 	Body    Sprite
@@ -19,28 +22,28 @@ func newPonyModel(appPath string, renderer *sdl.Renderer) PonyModel {
 	var ret PonyModel
 
 	ret.Body = newSprite(renderer)
-	ret.Body.InitFromAsset(appPath, "pony/body.png")
+	ret.Body.InitFromAsset(appPath, filepath.Join("pony", "body.png"))
 
 	ret.Eye[0] = newSprite(renderer)
-	ret.Eye[0].InitFromAsset(appPath, "pony/eye.png")
+	ret.Eye[0].InitFromAsset(appPath, filepath.Join("pony", "eye.png"))
 
 	ret.Eye[1] = newSprite(renderer)
-	ret.Eye[1].InitFromAsset(appPath, "pony/eye_blink.png")
+	ret.Eye[1].InitFromAsset(appPath, filepath.Join("pony", "eye_blink.png"))
 
 	ret.Eye[2] = newSprite(renderer)
-	ret.Eye[2].InitFromAsset(appPath, "pony/eye_joy.png")
+	ret.Eye[2].InitFromAsset(appPath, filepath.Join("pony", "eye_joy.png"))
 
 	ret.Rump[0] = newSprite(renderer)
-	ret.Rump[0].InitFromAsset(appPath, "pony/rump_down.png")
+	ret.Rump[0].InitFromAsset(appPath, filepath.Join("pony", "rump_down.png"))
 
 	ret.Rump[1] = newSprite(renderer)
-	ret.Rump[1].InitFromAsset(appPath, "pony/rump_up.png")
+	ret.Rump[1].InitFromAsset(appPath, filepath.Join("pony", "rump_up.png"))
 
 	ret.Tail[0] = newSprite(renderer)
-	ret.Tail[0].InitFromAsset(appPath, "pony/tail_down.png")
+	ret.Tail[0].InitFromAsset(appPath, filepath.Join("pony", "tail_down.png"))
 
 	ret.Tail[1] = newSprite(renderer)
-	ret.Tail[1].InitFromAsset(appPath, "pony/tail_up.png")
+	ret.Tail[1].InitFromAsset(appPath, filepath.Join("pony", "tail_up.png"))
 
 	ret.RumpIdx = 1
 	ret.TailIdx = 1
