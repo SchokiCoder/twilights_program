@@ -197,6 +197,10 @@ Also remove Unix system install.
 
 + add mention of sdl2 and go-sdl2 to about info
 
++ add linux packaging to makefile
+
+Also add License to packages.
+
 - add run.bat in package for windows to make this easily run in cmd.exe
 
 - add arg for disabling round clear sound

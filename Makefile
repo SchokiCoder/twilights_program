@@ -15,12 +15,12 @@ INSTALLDIR        :=$(INSTALLDIR_PARENT)/$(APP_NAME)_data
 
 all: vet build
 
-build:
-	go build $(GO_COMPILE_VARS)
+build: $(APP_NAME)
 
 clean:
 	rm -f $(APP_NAME)
 	rm -f $(APP_NAME).exe
+	rm -f package_linux_amd64.tar.gz
 	rm -f package_windows_amd64.zip
 
 vet:
@@ -37,9 +37,15 @@ uninstall:
 	rm -rf $(INSTALLDIR)/
 	rm $(INSTALLDIR_PARENT)/$(APP_NAME)
 
-package_windows_amd64.zip: $(APP_NAME).exe
-	zip $@ $< images/*/* fonts/* sounds/*
+package_linux_amd64.tar.gz: $(APP_NAME)
+	tar -czf $@ $< fonts/ images/ sounds/ LICENSE
 
-twilights_program.exe:
+$(APP_NAME):
+	go build $(GO_COMPILE_VARS)
+
+package_windows_amd64.zip: $(APP_NAME).exe
+	zip $@ $< images/*/* fonts/* sounds/* LICENSE
+
+$(APP_NAME).exe:
 	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 \
 		go build -tags static -ldflags "-s -w" $(GO_COMPILE_VARS)
