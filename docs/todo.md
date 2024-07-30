@@ -92,7 +92,7 @@ and use renderer.Clear instead of FillRect.
 
 + add hearts art
 
-## implement hearts art (wip)
+## implement hearts art (done)
 
 ### Source material observations
 
@@ -195,7 +195,7 @@ Also update README's build dependencies.
 
 Also remove Unix system install.
 
-- add sdl2 and go-sdl2 to copyright info
++ add mention of sdl2 and go-sdl2 to about info
 
 - add run.bat in package for windows to make this easily run in cmd.exe
 

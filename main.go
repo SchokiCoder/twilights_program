@@ -457,6 +457,10 @@ func main() {
 				"For more info visit:\n"+
 				"https://dejavu-fonts.github.io.\n"+
 				"\n"+
+				"This program uses SDL2 via go-sdl2:\n"+
+				"https://libsdl.org\n"+
+				"https://github.com/veandco/go-sdl2\n"+
+				"\n"+
 				"The source code of \"%v\" %v is available, "+
 				"licensed under the %v at:\n"+
 				"%v\n\n"+
