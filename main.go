@@ -137,6 +137,14 @@ func handleEvents(gameActive *bool,
 					ponyMdl,
 					wags)
 			}
+
+		case *sdl.KeyboardEvent:
+			event := event.(*sdl.KeyboardEvent)
+			if event.GetType() == sdl.KEYUP &&
+				event.Keysym.Sym == sdl.K_ESCAPE {
+					*gameActive = false
+					return false
+			}
 		}
 	}
 
@@ -455,7 +463,7 @@ func main() {
 				"\n"+
 				"The font used \"DejaVuSansMono\" is not mine.\n"+
 				"For more info visit:\n"+
-				"https://dejavu-fonts.github.io.\n"+
+				"https://dejavu-fonts.github.io\n"+
 				"\n"+
 				"This program uses SDL2 via go-sdl2:\n"+
 				"https://libsdl.org\n"+

@@ -201,13 +201,26 @@ Also remove Unix system install.
 
 Also add License to packages.
 
-- add run.bat in package for windows to make this easily run in cmd.exe
++ add run.bat in package for windows to make this easily run in cmd.exe
+  not needed lol
 
-- add arg for disabling round clear sound
++ add ending game with escape key
+
+- add focussing sdl window after the begin confirmation
+
+- add end confirmation after score print
+
 - add arg for timescale
+  -t --timescale
 - add arg for tickrate
+  -r --tickrate
+- add arg for disabling round clear sound
+  -C? --no-clear-sound
+- add fullscreen arg
+  -F? --fullscreen
 
-- add ending game with ESC
+- add help arg
+  -h --help
 
 - test build, install and run on different device
 
