@@ -6,6 +6,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/ttf"
@@ -26,18 +27,18 @@ func newSprite(renderer *sdl.Renderer) Sprite {
 	return ret
 }
 
-func (s *Sprite) InitFromAsset(assetpath string) {
+func (s *Sprite) InitFromAsset(appPath string, assetPath string) {
 	var (
 		err      error
 		fullpath string
 		pathPrefixes = []string{
-			"./images",
-			PathAssetsUser,
-			PathAssetsSys,
+			appPath,
+			filepath.Join(appPath, "images"),
+			filepath.Join(appPath, AppName + "_data", "images"),
 		}
 	)
 
-	fullpath = getFilepathFromPaths(pathPrefixes, assetpath)
+	fullpath = getFilepathFromPaths(pathPrefixes, assetPath)
 	if fullpath == "" {
 		panic(fmt.Sprintf("Image not found in asset paths: %v\n",
 			pathPrefixes))

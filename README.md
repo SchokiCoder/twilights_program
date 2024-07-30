@@ -17,13 +17,5 @@ This is her program.
 
 # Install from Repo
 
-First, build! (See above)
-
-## for system install
-
-- `sudo make install`
-
-## for user install
-
-- open Makefile, uncomment lower INSTALLDIR lines
+- build (See above)
 - `make install`

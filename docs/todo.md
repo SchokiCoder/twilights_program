@@ -191,6 +191,20 @@ and add heart counter to end game score.
 
 Also update README's build dependencies.
 
++ fix asset paths being stupidly hardcoded and add support for os agnostic paths
+
+Also remove Unix system install.
+
+- add sdl2 and go-sdl2 to copyright info
+
+- add run.bat in package for windows to make this easily run in cmd.exe
+
+- add arg for disabling round clear sound
+- add arg for timescale
+- add arg for tickrate
+
+- add ending game with ESC
+
 - test build, install and run on different device
 
 - set version 1.0.0

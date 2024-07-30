@@ -15,32 +15,32 @@ type PonyModel struct {
 	TailIdx int
 }
 
-func newPonyModel(renderer *sdl.Renderer) PonyModel {
+func newPonyModel(appPath string, renderer *sdl.Renderer) PonyModel {
 	var ret PonyModel
 
 	ret.Body = newSprite(renderer)
-	ret.Body.InitFromAsset("pony/body.png")
+	ret.Body.InitFromAsset(appPath, "pony/body.png")
 
 	ret.Eye[0] = newSprite(renderer)
-	ret.Eye[0].InitFromAsset("pony/eye.png")
+	ret.Eye[0].InitFromAsset(appPath, "pony/eye.png")
 
 	ret.Eye[1] = newSprite(renderer)
-	ret.Eye[1].InitFromAsset("pony/eye_blink.png")
+	ret.Eye[1].InitFromAsset(appPath, "pony/eye_blink.png")
 
 	ret.Eye[2] = newSprite(renderer)
-	ret.Eye[2].InitFromAsset("pony/eye_joy.png")
+	ret.Eye[2].InitFromAsset(appPath, "pony/eye_joy.png")
 
 	ret.Rump[0] = newSprite(renderer)
-	ret.Rump[0].InitFromAsset("pony/rump_down.png")
+	ret.Rump[0].InitFromAsset(appPath, "pony/rump_down.png")
 
 	ret.Rump[1] = newSprite(renderer)
-	ret.Rump[1].InitFromAsset("pony/rump_up.png")
+	ret.Rump[1].InitFromAsset(appPath, "pony/rump_up.png")
 
 	ret.Tail[0] = newSprite(renderer)
-	ret.Tail[0].InitFromAsset("pony/tail_down.png")
+	ret.Tail[0].InitFromAsset(appPath, "pony/tail_down.png")
 
 	ret.Tail[1] = newSprite(renderer)
-	ret.Tail[1].InitFromAsset("pony/tail_up.png")
+	ret.Tail[1].InitFromAsset(appPath, "pony/tail_up.png")
 
 	ret.RumpIdx = 1
 	ret.TailIdx = 1

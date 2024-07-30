@@ -6,6 +6,7 @@ package main
 
 import (
 	"errors"
+	"path/filepath"
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
@@ -20,9 +21,6 @@ var (
 	AppName       string
 	AppRepository string
 	AppVersion    string
-
-	PathAssetsSys  string
-	PathAssetsUser string
 )
 
 // Returns whether to run the app.
@@ -98,7 +96,7 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 	var fullpath string
 
 	for i := 0; i < len(pathPrefixes); i++ {
-		fullpath = pathPrefixes[i] + "/" + path
+		fullpath = filepath.Join(pathPrefixes[i], path)
 
 		f, err := os.Open(fullpath)
 		defer f.Close()
@@ -145,7 +143,7 @@ func handleEvents(gameActive *bool,
 	return true
 }
 
-func initAudio(sounds []*mix.Music) {
+func initAudio(appPath string, sounds []*mix.Music) {
 	var err error
 
 	err = mix.Init(0)
@@ -159,9 +157,9 @@ func initAudio(sounds []*mix.Music) {
 	}
 
 	pathPrefixes := []string{
-		"./sounds",
-		PathAssetsUser,
-		PathAssetsSys,
+		appPath,
+		filepath.Join(appPath, "sounds"),
+		filepath.Join(appPath, AppName + "_data", "sounds"),
 	}
 	paths := []string{
 		"Mappy - Main Theme.ogg",
@@ -184,25 +182,27 @@ func initAudio(sounds []*mix.Music) {
 	}
 }
 
-func initGfx(hearts []Sprite,
+func initGfx(appPath string,
+	hearts []Sprite,
 	ponyMdl *PonyModel,
 	renderer *sdl.Renderer,
 	win *sdl.Window) {
 
 	hearts[0] = newSprite(renderer)
-	hearts[0].InitFromAsset("heart/big.png")
+	hearts[0].InitFromAsset(appPath, "heart/big.png")
 
 	hearts[1] = newSprite(renderer)
-	hearts[1].InitFromAsset("heart/small.png")
+	hearts[1].InitFromAsset(appPath, "heart/small.png")
 
-	*ponyMdl = newPonyModel(renderer)
+	*ponyMdl = newPonyModel(appPath, renderer)
 
 	poo, brain := gfxPonyX, gfxPonyY // try using directly instead :)
 	ponyMdl.SetX(int32(poo))
 	ponyMdl.SetY(int32(brain))
 }
 
-func initText(bgLineYs *[]float64,
+func initText(appPath string,
+	bgLineYs *[]float64,
 	bgText         *Sprite,
 	fonts          []*ttf.Font,
 	intro          []Sprite,
@@ -215,9 +215,9 @@ func initText(bgLineYs *[]float64,
 	}
 
 	pathPrefixes := []string{
-		"./fonts",
-		PathAssetsUser,
-		PathAssetsSys,
+		appPath,
+		filepath.Join(appPath, "fonts"),
+		filepath.Join(appPath, AppName + "_data", "fonts"),
 	}
 
 	fullpath := getFilepathFromPaths(pathPrefixes, "DejaVuSansMono.ttf")
@@ -411,6 +411,7 @@ func tick(bgLineYs     *[]float64,
 
 func main() {
 	var (
+		appPath        string
 		bgLineYs       []float64
 		bgText         Sprite
 		drawIntro      int
@@ -433,6 +434,12 @@ func main() {
 		wags           int
 		win            *sdl.Window
 	)
+
+	appPath, err = os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	appPath = filepath.Dir(appPath)
 
 	mainloopActive = true
 	gameActive = false
@@ -470,7 +477,7 @@ func main() {
 	}
 	defer sdl.Quit()
 
-	initAudio(sounds[:])
+	initAudio(appPath, sounds[:])
 	defer quitAudio(sounds[:])
 
 	sounds[0].Play(-1)
@@ -499,10 +506,10 @@ func main() {
 
 	renderer.SetLogicalSize(gfxWindowWidth, gfxWindowHeight)
 
-	initGfx(hearts[:], &ponyMdl, renderer, win)
+	initGfx(appPath, hearts[:], &ponyMdl, renderer, win)
 	defer quitGfx(hearts[:], &ponyMdl, renderer)
 
-	initText(&bgLineYs, &bgText, fonts[:], intro[:], renderer)
+	initText(appPath, &bgLineYs, &bgText, fonts[:], intro[:], renderer)
 	defer quitText(&bgText, fonts[:], intro[:])
 
 	heartLifetimes[1] = heartLifetime

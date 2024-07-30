@@ -1,2 +1,7 @@
 twilights_program
+twilights_program.exe
+*.zip
+*.tar.gz
+*.tar.xz
+*.7z
 pkg

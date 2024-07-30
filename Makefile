@@ -6,38 +6,40 @@ LICENSE          :=GPL-2.0-or-later
 LICENSE_URL      :=https://www.gnu.org/licenses/gpl-2.0.html
 REPOSITORY       :=https://github.com/SchokiCoder/twilights_program
 VERSION          :=v0.0
-PATH_ASSETS_SYS  :=/usr/share/$(APP_NAME)
-PATH_ASSETS_USER :=$(HOME)/.local/share/$(APP_NAME)
+GO_COMPILE_VARS  :=-ldflags "-X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepository=$(REPOSITORY)' -X 'main.AppVersion=$(VERSION)'"
 
-INSTALLDIR_ASSETS :=$(PATH_ASSETS_SYS)
-INSTALLDIR_BIN    :=/usr/local/bin
-
-# uncomment for user install
-#INSTALLDIR_ASSETS :=$(PATH_ASSETS_USER)
-#INSTALLDIR_BIN    :=$(HOME)/.local/bin
+INSTALLDIR_PARENT :=$(HOME)/.local/bin
+INSTALLDIR        :=$(INSTALLDIR_PARENT)/$(APP_NAME)_data
 
 .PHONY: all build clean vet install uninstall
 
 all: vet build
 
 build:
-	go build \
-		-ldflags "-X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepository=$(REPOSITORY)' -X 'main.AppVersion=$(VERSION)' -X 'main.PathAssetsSys=$(PATH_ASSETS_SYS)' -X 'main.PathAssetsUser=$(PATH_ASSETS_USER)'"
+	go build $(GO_COMPILE_VARS)
 
 clean:
 	rm -f $(APP_NAME)
+	rm -f $(APP_NAME).exe
+	rm -f package_windows_amd64.zip
 
 vet:
 	go vet
 
 install: build
-	cp $(APP_NAME) $(INSTALLDIR_BIN)/
-	mkdir $(INSTALLDIR_ASSETS)
-	cp -r images/* $(INSTALLDIR_ASSETS)/
-	cp fonts/* $(INSTALLDIR_ASSETS)/
-	cp sounds/* $(INSTALLDIR_ASSETS)/
+	mkdir -p $(INSTALLDIR)
+	cp $(APP_NAME) $(INSTALLDIR_PARENT)/
+	cp -r images $(INSTALLDIR)/
+	cp -r fonts $(INSTALLDIR)/
+	cp -r sounds $(INSTALLDIR)/
 
 uninstall:
-	rm $(INSTALLDIR_BIN)/$(APP_NAME)
-	rm -rf $(INSTALLDIR_ASSETS)/*
-	rmdir $(INSTALLDIR_ASSETS)
+	rm -rf $(INSTALLDIR)/
+	rm $(INSTALLDIR_PARENT)/$(APP_NAME)
+
+package_windows_amd64.zip: $(APP_NAME).exe
+	zip $@ $< images/*/* fonts/* sounds/*
+
+twilights_program.exe:
+	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 \
+		go build -tags static -ldflags "-s -w" $(GO_COMPILE_VARS)
