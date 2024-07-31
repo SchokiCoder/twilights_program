@@ -208,7 +208,10 @@ Also add License to packages.
 
 + add focussing sdl window after the begin confirmation
 
-- add end confirmation after score print
++ add end confirmation after score print
+
+Also hide window as soon as possible,
+and add file dependencies in Makefile.
 
 - add arg for timescale
   -t --timescale

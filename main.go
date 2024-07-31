@@ -615,6 +615,7 @@ func main() {
 			win)
 	}
 
+	win.Hide()
 	sounds[3].Play(0)
 
 	hadJoy := func() string {
@@ -628,7 +629,10 @@ func main() {
 Twiggy wagged %v times,
 and produced %v hearts of joy.
 %v ponies had joy in the making of this film.
+
+Press <Enter> to continue.
 `, uptime - gameStartTime, wags, heartCount, hadJoy)
 
-	for mix.PlayingMusic() {}
+	dummy := []byte{'0'}
+	os.Stdin.Read(dummy)
 }
