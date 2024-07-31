@@ -117,7 +117,9 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 }
 
 // Returns whether app should stay active.
-func handleArgs(tickrate *float64, timescale *float64) bool {
+func handleArgs(playClearSound *bool,
+	tickrate *float64,
+	timescale *float64) bool {
 	var err error
 
 	for i := 1; i < len(os.Args); i++ {
@@ -148,6 +150,11 @@ func handleArgs(tickrate *float64, timescale *float64) bool {
 				AppRepository,
 				AppLicenseUrl)
 			return false
+
+		case "-C":
+			fallthrough
+		case "--no-clear-sound":
+			*playClearSound = false
 
 		case "-r":
 			fallthrough
@@ -500,6 +507,7 @@ func main() {
 		intro          [2]Sprite
 		lastTick       time.Time
 		mainloopActive bool
+		playClearSound bool
 		ponyMdl        PonyModel
 		renderer       *sdl.Renderer
 		sounds         [4]*mix.Music
@@ -518,12 +526,13 @@ func main() {
 	}
 	appPath = filepath.Dir(appPath)
 
-	mainloopActive = true
 	gameActive     = false
+	mainloopActive = true
+	playClearSound = true
 	tickrate       = stdTickrate
 	timescale      = stdTimescale
 
-	if handleArgs(&tickrate, &timescale) == false {
+	if handleArgs(&playClearSound, &tickrate, &timescale) == false {
 		return
 	}
 
@@ -542,6 +551,7 @@ func main() {
 		return
 	}
 
+	mix.HaltMusic()
 	sounds[1].Play(0)
 
 	win, err = sdl.CreateWindow("Twilight's Program",
@@ -617,6 +627,7 @@ func main() {
 	go func() {
 		for gameActive == false {}
 		if mainloopActive {
+			mix.HaltMusic()
 			sounds[2].Play(0)
 		}
 	}()
@@ -662,7 +673,10 @@ func main() {
 	}
 
 	win.Hide()
-	sounds[3].Play(0)
+	mix.HaltMusic()
+	if playClearSound {
+		sounds[3].Play(0)
+	}
 
 	hadJoy := func() string {
 		if wags >= wagsUntilJoy {

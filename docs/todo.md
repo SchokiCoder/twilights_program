@@ -215,12 +215,14 @@ and add file dependencies in Makefile.
 
 + add arg for timescale
   -t --timescale
-- add arg for tickrate
++ add arg for tickrate
   -r --tickrate
-- add arg for disabling round clear sound
-  -C? --no-clear-sound
++ add arg for disabling round clear sound
+  -C --no-clear-sound
 - add fullscreen arg
-  -F? --fullscreen
+  -F --fullscreen
+- add arg for disabling confirmations
+  -c --no-confirmations
 
 - add help arg
   -h --help
