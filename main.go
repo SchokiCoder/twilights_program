@@ -117,7 +117,8 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 }
 
 // Returns whether app should stay active.
-func handleArgs(playClearSound *bool,
+func handleArgs(enableConfirmations *bool,
+	playClearSound *bool,
 	tickrate *float64,
 	timescale *float64) bool {
 	var err error
@@ -150,6 +151,11 @@ func handleArgs(playClearSound *bool,
 				AppRepository,
 				AppLicenseUrl)
 			return false
+
+		case "-c":
+			fallthrough
+		case "--no-confirmations":
+			*enableConfirmations = false
 
 		case "-C":
 			fallthrough
@@ -493,31 +499,32 @@ func tick(bgLineYs     *[]float64,
 
 func main() {
 	var (
-		appPath        string
-		bgLineYs       []float64
-		bgText         Sprite
-		drawIntro      int
-		err            error
-		fonts          [2]*ttf.Font
-		gameActive     bool
-		heartCount     int
-		heartQue       int
-		hearts         [2]Sprite
-		heartLifetimes [8]float64
-		intro          [2]Sprite
-		lastTick       time.Time
-		mainloopActive bool
-		playClearSound bool
-		ponyMdl        PonyModel
-		renderer       *sdl.Renderer
-		sounds         [4]*mix.Music
-		start          time.Time
-		tickrate       float64
-		timescale      float64
-		untilBgSpawn   float64
-		uptime         float64
-		wags           int
-		win            *sdl.Window
+		appPath             string
+		bgLineYs            []float64
+		bgText              Sprite
+		enableConfirmations bool
+		drawIntro           int
+		err                 error
+		fonts               [2]*ttf.Font
+		gameActive          bool
+		heartCount          int
+		heartQue            int
+		hearts              [2]Sprite
+		heartLifetimes      [8]float64
+		intro               [2]Sprite
+		lastTick            time.Time
+		mainloopActive      bool
+		playClearSound      bool
+		ponyMdl             PonyModel
+		renderer            *sdl.Renderer
+		sounds              [4]*mix.Music
+		start               time.Time
+		tickrate            float64
+		timescale           float64
+		untilBgSpawn        float64
+		uptime              float64
+		wags                int
+		win                 *sdl.Window
 	)
 
 	appPath, err = os.Executable()
@@ -526,13 +533,17 @@ func main() {
 	}
 	appPath = filepath.Dir(appPath)
 
-	gameActive     = false
-	mainloopActive = true
-	playClearSound = true
-	tickrate       = stdTickrate
-	timescale      = stdTimescale
+	enableConfirmations = true
+	gameActive          = false
+	mainloopActive      = true
+	playClearSound      = true
+	tickrate            = stdTickrate
+	timescale           = stdTimescale
 
-	if handleArgs(&playClearSound, &tickrate, &timescale) == false {
+	if handleArgs(&enableConfirmations,
+		&playClearSound,
+		&tickrate,
+		&timescale) == false {
 		return
 	}
 
@@ -547,8 +558,10 @@ func main() {
 
 	sounds[0].Play(-1)
 
-	if confirmationPrompt() == false {
-		return
+	if enableConfirmations {
+		if confirmationPrompt() == false {
+			return
+		}
 	}
 
 	mix.HaltMusic()
@@ -690,9 +703,12 @@ Twiggy wagged %v times,
 and produced %v hearts of joy.
 %v ponies had joy in the making of this film.
 
-Press <Enter> to continue.
 `, uptime - gameStartTime, wags, heartCount, hadJoy)
 
-	dummy := []byte{'0'}
-	os.Stdin.Read(dummy)
+	if enableConfirmations {
+		fmt.Printf("Press <Enter> to continue.\n")
+
+		dummy := []byte{'0'}
+		os.Stdin.Read(dummy)
+	}
 }

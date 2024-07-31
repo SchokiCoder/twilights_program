@@ -219,10 +219,10 @@ and add file dependencies in Makefile.
   -r --tickrate
 + add arg for disabling round clear sound
   -C --no-clear-sound
++ add arg for disabling confirmations
+  -c --no-confirmations
 - add fullscreen arg
   -F --fullscreen
-- add arg for disabling confirmations
-  -c --no-confirmations
 
 - add help arg
   -h --help
