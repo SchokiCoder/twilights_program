@@ -206,7 +206,7 @@ Also add License to packages.
 
 + add ending game with escape key
 
-- add focussing sdl window after the begin confirmation
++ add focussing sdl window after the begin confirmation
 
 - add end confirmation after score print
 

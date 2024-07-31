@@ -511,6 +511,8 @@ func main() {
 	}
 	defer win.Destroy()
 
+	win.Raise()
+
 	renderer, err = sdl.CreateRenderer(win, -1, 0)
 	if err != nil {
 		panic(err)
