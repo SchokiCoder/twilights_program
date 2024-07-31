@@ -117,7 +117,7 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 }
 
 // Returns whether app should stay active.
-func handleArgs(timescale *float64) bool {
+func handleArgs(tickrate *float64, timescale *float64) bool {
 	var err error
 
 	for i := 1; i < len(os.Args); i++ {
@@ -148,6 +148,17 @@ func handleArgs(timescale *float64) bool {
 				AppRepository,
 				AppLicenseUrl)
 			return false
+
+		case "-r":
+			fallthrough
+		case "--tickrate":
+			*tickrate, err = strconv.ParseFloat(os.Args[i + 1], 64)
+			if err != nil {
+				fmt.Fprintf(os.Stderr,
+					"Argument for tickrate is not a valid float.\n")
+				*tickrate = stdTickrate
+			}
+			i++
 
 		case "-t":
 			fallthrough
@@ -418,6 +429,7 @@ func tick(bgLineYs     *[]float64,
 	lastTick       *time.Time,
 	ponyMdl        *PonyModel,
 	renderer       *sdl.Renderer,
+	tickrate       float64,
 	timescale      float64,
 	untilBgSpawn   *float64,
 	uptime         *float64,
@@ -492,6 +504,7 @@ func main() {
 		renderer       *sdl.Renderer
 		sounds         [4]*mix.Music
 		start          time.Time
+		tickrate       float64
 		timescale      float64
 		untilBgSpawn   float64
 		uptime         float64
@@ -506,10 +519,11 @@ func main() {
 	appPath = filepath.Dir(appPath)
 
 	mainloopActive = true
-	gameActive = false
-	timescale = stdTimescale
+	gameActive     = false
+	tickrate       = stdTickrate
+	timescale      = stdTimescale
 
-	if handleArgs(&timescale) == false {
+	if handleArgs(&tickrate, &timescale) == false {
 		return
 	}
 
@@ -639,6 +653,7 @@ func main() {
 			&lastTick,
 			&ponyMdl,
 			renderer,
+			tickrate,
 			timescale,
 			&untilBgSpawn,
 			&uptime,

@@ -22,7 +22,7 @@ const (
 )
 
 const (
-	tickrate = 60.0
+	stdTickrate = 60.0
 	stdTimescale = 1.0
 )
 
