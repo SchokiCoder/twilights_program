@@ -213,7 +213,7 @@ Also add License to packages.
 Also hide window as soon as possible,
 and add file dependencies in Makefile.
 
-- add arg for timescale
++ add arg for timescale
   -t --timescale
 - add arg for tickrate
   -r --tickrate
@@ -224,6 +224,8 @@ and add file dependencies in Makefile.
 
 - add help arg
   -h --help
+
+- add wag on pressing space key
 
 - test build, install and run on different device
 

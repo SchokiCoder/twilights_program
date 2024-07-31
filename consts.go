@@ -23,7 +23,7 @@ const (
 
 const (
 	tickrate = 60.0
-	timescale = 1.0
+	stdTimescale = 1.0
 )
 
 // The durations and times are based on the video being 24 frames/second.

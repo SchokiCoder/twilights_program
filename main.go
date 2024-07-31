@@ -6,13 +6,14 @@ package main
 
 import (
 	"errors"
-	"path/filepath"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"time"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 	"github.com/veandco/go-sdl2/mix"
-	"os"
-	"time"
 )
 
 var (
@@ -115,12 +116,62 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 	return ""
 }
 
+// Returns whether app should stay active.
+func handleArgs(timescale *float64) bool {
+	var err error
+
+	for i := 1; i < len(os.Args); i++ {
+		switch os.Args[i] {
+		case "-a":
+			fallthrough
+		case "--about":
+			fmt.Printf("The sound files used are not created by me.\n"+
+				"They have been composed by Nobuyuki Ohnogi, "+
+				"for \"Mappy\", developed by Namco in 1983.\n"+
+				"\n"+
+				"The font used \"DejaVuSansMono\" is not mine.\n"+
+				"For more info visit:\n"+
+				"https://dejavu-fonts.github.io\n"+
+				"\n"+
+				"This program uses SDL2 via go-sdl2:\n"+
+				"https://libsdl.org\n"+
+				"https://github.com/veandco/go-sdl2\n"+
+				"\n"+
+				"The source code of \"%v\" %v is available, "+
+				"licensed under the %v at:\n"+
+				"%v\n\n"+
+				"If you did not receive a copy of the license, "+
+				"see below:\n"+
+				"%v\n",
+				AppName, AppVersion,
+				AppLicense,
+				AppRepository,
+				AppLicenseUrl)
+			return false
+
+		case "-t":
+			fallthrough
+		case "--timescale":
+			*timescale, err = strconv.ParseFloat(os.Args[i + 1], 64)
+			if err != nil {
+				fmt.Fprintf(os.Stderr,
+					"Argument for timescale is not a valid float.\n")
+				*timescale = stdTimescale
+			}
+			i++
+		}
+	}
+
+	return true
+}
+
 // Returns whether mainloop should stay active.
 func handleEvents(gameActive *bool,
-	heartCount *int,
-	heartQue *int,
-	ponyMdl *PonyModel,
-	wags *int) bool {
+	heartCount           *int,
+	heartQue             *int,
+	ponyMdl              *PonyModel,
+	timescale            float64,
+	wags                 *int) bool {
 	event := sdl.PollEvent()
 
 	for ; event != nil; event = sdl.PollEvent() {
@@ -135,6 +186,7 @@ func handleEvents(gameActive *bool,
 					heartCount,
 					heartQue,
 					ponyMdl,
+					timescale,
 					wags)
 			}
 
@@ -285,6 +337,7 @@ func onWag(gameActive *bool,
 	heartCount    *int,
 	heartQue      *int,
 	ponyMdl       *PonyModel,
+	timescale     float64,
 	wags          *int) {
 
 	if *gameActive {
@@ -298,7 +351,7 @@ func onWag(gameActive *bool,
 
 		*wags++
 		if *wags == wagsUntilJoy {
-			go startTwiJoy(ponyMdl)
+			go startTwiJoy(ponyMdl, timescale)
 		}
 
 		if int(float64(*wags) / wagsForHeart) > *heartCount {
@@ -345,7 +398,7 @@ func quitText(bgText *Sprite,
 	ttf.Quit()
 }
 
-func startTwiJoy(ponyMdl *PonyModel) {
+func startTwiJoy(ponyMdl *PonyModel, timescale float64) {
 	joyDelayBegin := time.Now()
 	for time.Since(joyDelayBegin).Seconds() * timescale < joyThroughWagsDelay {}
 
@@ -365,6 +418,7 @@ func tick(bgLineYs     *[]float64,
 	lastTick       *time.Time,
 	ponyMdl        *PonyModel,
 	renderer       *sdl.Renderer,
+	timescale      float64,
 	untilBgSpawn   *float64,
 	uptime         *float64,
 	wags           *int,
@@ -407,6 +461,7 @@ func tick(bgLineYs     *[]float64,
 			heartCount,
 			heartQue,
 			ponyMdl,
+			timescale,
 			wags) == false {
 			return false
 		}
@@ -437,6 +492,7 @@ func main() {
 		renderer       *sdl.Renderer
 		sounds         [4]*mix.Music
 		start          time.Time
+		timescale      float64
 		untilBgSpawn   float64
 		uptime         float64
 		wags           int
@@ -451,36 +507,10 @@ func main() {
 
 	mainloopActive = true
 	gameActive = false
+	timescale = stdTimescale
 
-	for i := 1; i < len(os.Args); i++ {
-		switch os.Args[i] {
-		case "-a":
-			fallthrough
-		case "--about":
-			fmt.Printf("The sound files used are not created by me.\n"+
-				"They have been composed by Nobuyuki Ohnogi, "+
-				"for \"Mappy\", developed by Namco in 1983.\n"+
-				"\n"+
-				"The font used \"DejaVuSansMono\" is not mine.\n"+
-				"For more info visit:\n"+
-				"https://dejavu-fonts.github.io\n"+
-				"\n"+
-				"This program uses SDL2 via go-sdl2:\n"+
-				"https://libsdl.org\n"+
-				"https://github.com/veandco/go-sdl2\n"+
-				"\n"+
-				"The source code of \"%v\" %v is available, "+
-				"licensed under the %v at:\n"+
-				"%v\n\n"+
-				"If you did not receive a copy of the license, "+
-				"see below:\n"+
-				"%v\n",
-				AppName, AppVersion,
-				AppLicense,
-				AppRepository,
-				AppLicenseUrl)
-			return
-		}
+	if handleArgs(&timescale) == false {
+		return
 	}
 
 	err = sdl.Init(sdl.INIT_EVERYTHING)
@@ -609,6 +639,7 @@ func main() {
 			&lastTick,
 			&ponyMdl,
 			renderer,
+			timescale,
 			&untilBgSpawn,
 			&uptime,
 			&wags,
