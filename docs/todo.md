@@ -221,7 +221,7 @@ and add file dependencies in Makefile.
   -C --no-clear-sound
 + add arg for disabling confirmations
   -c --no-confirmations
-- add fullscreen arg
++ add fullscreen arg
   -F --fullscreen
 
 - add help arg

@@ -118,9 +118,10 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 
 // Returns whether app should stay active.
 func handleArgs(enableConfirmations *bool,
-	playClearSound *bool,
-	tickrate *float64,
-	timescale *float64) bool {
+	fullscreen                  *bool,
+	playClearSound              *bool,
+	tickrate                    *float64,
+	timescale                   *float64) bool {
 	var err error
 
 	for i := 1; i < len(os.Args); i++ {
@@ -161,6 +162,11 @@ func handleArgs(enableConfirmations *bool,
 			fallthrough
 		case "--no-clear-sound":
 			*playClearSound = false
+
+		case "-F":
+			fallthrough
+		case "--fullscreen":
+			*fullscreen = true
 
 		case "-r":
 			fallthrough
@@ -506,6 +512,7 @@ func main() {
 		drawIntro           int
 		err                 error
 		fonts               [2]*ttf.Font
+		fullscreen          bool
 		gameActive          bool
 		heartCount          int
 		heartQue            int
@@ -534,6 +541,7 @@ func main() {
 	appPath = filepath.Dir(appPath)
 
 	enableConfirmations = true
+	fullscreen          = false
 	gameActive          = false
 	mainloopActive      = true
 	playClearSound      = true
@@ -541,6 +549,7 @@ func main() {
 	timescale           = stdTimescale
 
 	if handleArgs(&enableConfirmations,
+		&fullscreen,
 		&playClearSound,
 		&tickrate,
 		&timescale) == false {
@@ -578,6 +587,9 @@ func main() {
 	}
 	defer win.Destroy()
 
+	if fullscreen {
+		win.SetFullscreen(sdl.WINDOW_FULLSCREEN_DESKTOP)
+	}
 	win.Raise()
 
 	renderer, err = sdl.CreateRenderer(win, -1, 0)
