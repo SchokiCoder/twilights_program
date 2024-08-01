@@ -226,7 +226,7 @@ and add file dependencies in Makefile.
 + add help arg
   -h --help
 
-- add wag on pressing space key
++ add wag on pressing space key
 
 - test build, install and run on different device
 

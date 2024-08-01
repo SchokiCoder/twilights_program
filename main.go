@@ -228,10 +228,20 @@ func handleEvents(gameActive *bool,
 
 		case *sdl.KeyboardEvent:
 			event := event.(*sdl.KeyboardEvent)
-			if event.GetType() == sdl.KEYUP &&
-				event.Keysym.Sym == sdl.K_ESCAPE {
+			if event.GetType() == sdl.KEYUP {
+				switch event.Keysym.Sym {
+				case sdl.K_ESCAPE:
 					*gameActive = false
 					return false
+
+				case sdl.K_SPACE:
+					onWag(gameActive,
+					heartCount,
+					heartQue,
+					ponyMdl,
+					timescale,
+					wags)
+				}
 			}
 		}
 	}
