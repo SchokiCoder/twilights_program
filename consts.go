@@ -57,6 +57,48 @@ const (
 	bgLineSpawnTime = bgLineTravelTime / gfxBgMaxLines
 )
 
+const helpText = `Usage: %v [OPTIONS]
+
+Options:
+
+    -a --about
+        Prints copyright notices,
+        program name, version, license, and repository information,
+        then exits.
+
+    -c --no-confirmation
+        Disables all confirmation prompts.
+
+    -C --no-clear-sound
+        Disables the clear sound, which normally plays after the game ends.
+
+    -F --fullscreen
+        Enables fullscreen.
+
+    -h --help
+        Prints this message, then exits.
+
+    -r --tickrate FLOAT
+        Sets the tickrate to FLOAT.
+        This also sets the framerate to the same value, as there is no point in
+        seperating the two in this application.
+        A valid float uses a dot character not the comma character.
+        The default is '%0.1f'.
+
+    -t --timescale FLOAT
+        Sets the timescale to FLOAT.
+        The default is '%0.1f'.
+
+Keybinds:
+
+    <Escape>
+        Quits the program.
+
+    <Space>
+    <LMB>
+        Wags the tail.
+`
+
 func getBgTextColor() sdl.Color {
 	return sdl.Color {
 		R: 25,

@@ -168,6 +168,12 @@ func handleArgs(enableConfirmations *bool,
 		case "--fullscreen":
 			*fullscreen = true
 
+		case "-h":
+			fallthrough
+		case "--help":
+			fmt.Printf(helpText, AppName, stdTickrate, stdTimescale)
+			return false
+
 		case "-r":
 			fallthrough
 		case "--tickrate":

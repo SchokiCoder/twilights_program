@@ -223,8 +223,7 @@ and add file dependencies in Makefile.
   -c --no-confirmations
 + add fullscreen arg
   -F --fullscreen
-
-- add help arg
++ add help arg
   -h --help
 
 - add wag on pressing space key
