@@ -538,6 +538,7 @@ func main() {
 		heartLifetimes      [8]float64
 		intro               [2]Sprite
 		lastTick            time.Time
+		legacyFullscreen    bool
 		mainloopActive      bool
 		playClearSound      bool
 		ponyMdl             PonyModel
@@ -561,6 +562,7 @@ func main() {
 	enableConfirmations = true
 	fullscreen          = false
 	gameActive          = false
+	legacyFullscreen    = false
 	mainloopActive      = true
 	playClearSound      = true
 	tickrate            = stdTickrate
@@ -591,9 +593,6 @@ func main() {
 		}
 	}
 
-	mix.HaltMusic()
-	sounds[1].Play(0)
-
 	win, err = sdl.CreateWindow("Twilight's Program",
 		sdl.WINDOWPOS_UNDEFINED,
 		sdl.WINDOWPOS_UNDEFINED,
@@ -606,7 +605,17 @@ func main() {
 	defer win.Destroy()
 
 	if fullscreen {
-		win.SetFullscreen(sdl.WINDOW_FULLSCREEN_DESKTOP)
+		err = win.SetFullscreen(sdl.WINDOW_FULLSCREEN_DESKTOP)
+		if err != nil {
+			err = win.SetFullscreen(sdl.WINDOW_FULLSCREEN)
+			if err != nil {
+				fmt.Fprintf(os.Stderr,
+					"Fullscreen cannot be set.\n%v\n",
+					err)
+			} else {
+				legacyFullscreen = true
+			}
+		}
 	}
 	win.Raise()
 
@@ -616,6 +625,12 @@ func main() {
 	}
 
 	renderer.SetLogicalSize(gfxWindowWidth, gfxWindowHeight)
+
+	if legacyFullscreen {
+		time.Sleep(3 * time.Second)
+	}
+	mix.HaltMusic()
+	sounds[1].Play(0)
 
 	initGfx(appPath, hearts[:], &ponyMdl, renderer, win)
 	defer quitGfx(hearts[:], &ponyMdl, renderer)

@@ -235,7 +235,7 @@ It needs the full spiel of a question in a loop,
 because Windows is very fun to work with, and didn't cause a delay of days.
 Shoot me now.
 
-- improve switch to fullscreen handling
++ improve switch to fullscreen handling
 
 - add warning against unrecognized arguments
 
