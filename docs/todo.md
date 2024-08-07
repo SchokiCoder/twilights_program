@@ -228,6 +228,17 @@ and add file dependencies in Makefile.
 
 + add wag on pressing space key
 
++ fix score board confirmation on windows
+
+It ignores a simple enter to continue, and a simple stdin question.
+It needs the full spiel of a question in a loop,
+because Windows is very fun to work with, and didn't cause a delay of days.
+Shoot me now.
+
+- improve switch to fullscreen handling
+
+- add warning against unrecognized arguments
+
 - test build, install and run on different device
 
 - set version 1.0.0

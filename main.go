@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"time"
 	"github.com/veandco/go-sdl2/sdl"
@@ -24,12 +25,13 @@ var (
 	AppVersion    string
 )
 
-// Returns whether to run the app.
-func confirmationPrompt() bool {
+// Asks question with binary answer.
+// Returns user answer as bool.
+func confirmationPrompt(question string) bool {
 	var input = make([]byte, 2)
 
 	for {
-		fmt.Printf("run program? (y/n)\n");
+		fmt.Printf("%v (y/n)\n", question);
 
 		_, err := os.Stdin.Read(input)
 		if err != nil {
@@ -584,7 +586,7 @@ func main() {
 	sounds[0].Play(-1)
 
 	if enableConfirmations {
-		if confirmationPrompt() == false {
+		if confirmationPrompt("run program?") == false {
 			return
 		}
 	}
@@ -734,9 +736,14 @@ and produced %v hearts of joy.
 `, uptime - gameStartTime, wags, heartCount, hadJoy)
 
 	if enableConfirmations {
-		fmt.Printf("Press <Enter> to continue.\n")
-
-		dummy := []byte{'0'}
-		os.Stdin.Read(dummy)
+		if runtime.GOOS == "windows" {
+				confirmationPrompt("Have you read?")
+				fmt.Printf("Oh, good. "+
+					"Billy really wanted to make sure you did.\n")
+		} else {
+			fmt.Printf("Press <Enter> to continue.\n")
+			dummy := []byte{'0'}
+			os.Stdin.Read(dummy)
+		}
 	}
 }

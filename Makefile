@@ -38,6 +38,8 @@ uninstall:
 	rm -rf $(INSTALLDIR)/
 	rm $(INSTALLDIR_PARENT)/$(APP_NAME)
 
+packages: package_linux_amd64.tar.gz package_windows_amd64.zip
+
 package_linux_amd64.tar.gz: $(APP_NAME)
 	tar -czf $@ $< fonts/ images/ sounds/ LICENSE
 
