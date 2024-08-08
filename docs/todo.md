@@ -239,6 +239,8 @@ Shoot me now.
 
 + add warning against unrecognized arguments
 
++ fix confirmation input possibly trailing into next loop iterations
+
 - test build, install and run on different device
 
 - set version 1.0.0

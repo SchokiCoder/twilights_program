@@ -28,12 +28,12 @@ var (
 // Asks question with binary answer.
 // Returns user answer as bool.
 func confirmationPrompt(question string) bool {
-	var input = make([]byte, 2)
+	var input = make([]byte, 4)
 
 	for {
 		fmt.Printf("%v (y/n)\n", question);
 
-		_, err := os.Stdin.Read(input)
+		_, err := fmt.Scanln(&input)
 		if err != nil {
 			panic(err)
 		}
