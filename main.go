@@ -197,6 +197,10 @@ func handleArgs(enableConfirmations *bool,
 				*timescale = stdTimescale
 			}
 			i++
+
+		default:
+			fmt.Fprintf(os.Stderr, "Argument \"%v\" is not recognized.\n",
+				os.Args[i])
 		}
 	}
 

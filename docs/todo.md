@@ -237,7 +237,7 @@ Shoot me now.
 
 + improve switch to fullscreen handling
 
-- add warning against unrecognized arguments
++ add warning against unrecognized arguments
 
 - test build, install and run on different device
 
