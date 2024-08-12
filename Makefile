@@ -5,7 +5,7 @@ APP_NAME         :=twilights_program
 LICENSE          :=GPL-2.0-or-later
 LICENSE_URL      :=https://www.gnu.org/licenses/gpl-2.0.html
 REPOSITORY       :=https://github.com/SchokiCoder/twilights_program
-VERSION          :=v0.0
+VERSION          :=v1.0
 GO_COMPILE_VARS  :=-ldflags "-X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepository=$(REPOSITORY)' -X 'main.AppVersion=$(VERSION)'"
 SRC              :=consts.go main.go pony_model.go sprite.go
 

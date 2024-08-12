@@ -1,5 +1,9 @@
 # additional improvements
 
+- flatpak??
+
+- linux package: consider ldflags -s -w
+
 - make heart lifetimes somewhat random?
   possible, but adds quite some complexity for little visual difference
 
@@ -241,8 +245,4 @@ Shoot me now.
 
 + fix confirmation input possibly trailing into next loop iterations
 
-- test build, install and run on different device
-
-- set version 1.0.0
-
-- flatpak ??
++ set version to 1.0
