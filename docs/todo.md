@@ -1,5 +1,14 @@
 # additional improvements
 
++ enforce new formatting for function declarations
+
+Putting the first parameter already on a new line,
+and the closing parenthesis with return type and opening bracket on a
+new line fixes everything I disliked so far.
+There is a clear cut between params and function start,
+which often is var declarations.
+No more weird alignment because of first param vs the other.
+
 - flatpak??
 
 - linux package: consider ldflags -s -w
@@ -25,7 +34,7 @@
   but recreating this barely notable inconsistency
   on purpose adds complexity that I am not too fond of
 
-# basics
+# basics v1.0
 
 ## tasks
 

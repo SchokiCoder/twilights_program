@@ -5,3 +5,4 @@ twilights_program.exe
 *.tar.xz
 *.7z
 pkg
+vendor

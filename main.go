@@ -48,7 +48,8 @@ func confirmationPrompt(question string) bool {
 	}
 }
 
-func draw(bgLineYs     []float64,
+func draw(
+	bgLineYs       []float64,
 	bgLine         Sprite,
 	drawIntro      int,
 	hearts         [2]Sprite,
@@ -56,8 +57,8 @@ func draw(bgLineYs     []float64,
 	intro          [2]Sprite,
 	ponyMdl        PonyModel,
 	renderer       *sdl.Renderer,
-	win            *sdl.Window) {
-
+	win            *sdl.Window,
+) {
 	renderer.SetDrawColor(49, 229, 184, 255)
 	renderer.Clear()
 
@@ -119,11 +120,13 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 }
 
 // Returns whether app should stay active.
-func handleArgs(enableConfirmations *bool,
-	fullscreen                  *bool,
-	playClearSound              *bool,
-	tickrate                    *float64,
-	timescale                   *float64) bool {
+func handleArgs(
+	enableConfirmations *bool,
+	fullscreen          *bool,
+	playClearSound      *bool,
+	tickrate            *float64,
+	timescale           *float64,
+) bool {
 	var err error
 
 	for i := 1; i < len(os.Args); i++ {
@@ -208,12 +211,14 @@ func handleArgs(enableConfirmations *bool,
 }
 
 // Returns whether mainloop should stay active.
-func handleEvents(gameActive *bool,
-	heartCount           *int,
-	heartQue             *int,
-	ponyMdl              *PonyModel,
-	timescale            float64,
-	wags                 *int) bool {
+func handleEvents(
+	gameActive *bool,
+	heartCount *int,
+	heartQue   *int,
+	ponyMdl    *PonyModel,
+	timescale  float64,
+	wags       *int,
+) bool {
 	event := sdl.PollEvent()
 
 	for ; event != nil; event = sdl.PollEvent() {
@@ -294,12 +299,13 @@ func initAudio(appPath string, sounds []*mix.Music) {
 	}
 }
 
-func initGfx(appPath string,
-	hearts []Sprite,
-	ponyMdl *PonyModel,
+func initGfx(
+	appPath  string,
+	hearts   []Sprite,
+	ponyMdl  *PonyModel,
 	renderer *sdl.Renderer,
-	win *sdl.Window) {
-
+	win      *sdl.Window,
+) {
 	hearts[0] = newSprite(renderer)
 	hearts[0].InitFromAsset(appPath, "heart/big.png")
 
@@ -313,12 +319,14 @@ func initGfx(appPath string,
 	ponyMdl.SetY(int32(brain))
 }
 
-func initText(appPath string,
+func initText(
+	appPath  string,
 	bgLineYs *[]float64,
-	bgText         *Sprite,
-	fonts          []*ttf.Font,
-	intro          []Sprite,
-	renderer       *sdl.Renderer) {
+	bgText   *Sprite,
+	fonts    []*ttf.Font,
+	intro    []Sprite,
+	renderer *sdl.Renderer,
+) {
 	var err error
 
 	err = ttf.Init()
@@ -365,11 +373,12 @@ func initText(appPath string,
 	*bgLineYs = append(*bgLineYs, gfxFirstBgLineYOffset)
 }
 
-func moveBgLines(bgLineYs *[]float64,
-	delta float64,
+func moveBgLines(
+	bgLineYs     *[]float64,
+	delta        float64,
 	untilBgSpawn *float64,
-	lineHeight int32) {
-
+	lineHeight   int32,
+) {
 	*untilBgSpawn -= delta
 	if *untilBgSpawn <= 0 {
 		*bgLineYs = append(*bgLineYs, float64(0 - lineHeight))
@@ -385,13 +394,14 @@ func moveBgLines(bgLineYs *[]float64,
 	}
 }
 
-func onWag(gameActive *bool,
-	heartCount    *int,
-	heartQue      *int,
-	ponyMdl       *PonyModel,
-	timescale     float64,
-	wags          *int) {
-
+func onWag(
+	gameActive *bool,
+	heartCount *int,
+	heartQue   *int,
+	ponyMdl    *PonyModel,
+	timescale  float64,
+	wags       *int,
+) {
 	if *gameActive {
 		if ponyMdl.RumpIdx == 0 {
 			ponyMdl.RumpIdx = 1
@@ -423,10 +433,11 @@ func quitAudio(sounds []*mix.Music) {
 	mix.Quit()
 }
 
-func quitGfx(hearts []Sprite,
-	ponyMdl     *PonyModel,
-	renderer    *sdl.Renderer) {
-
+func quitGfx(
+	hearts   []Sprite,
+	ponyMdl  *PonyModel,
+	renderer *sdl.Renderer,
+) {
 	for i := 0; i < len(hearts); i++ {
 		hearts[i].Free()
 	}
@@ -434,10 +445,11 @@ func quitGfx(hearts []Sprite,
 	renderer.Destroy()
 }
 
-func quitText(bgText *Sprite,
-	fonts        []*ttf.Font,
-	intro        []Sprite,) {
-
+func quitText(
+	bgText *Sprite,
+	fonts  []*ttf.Font,
+	intro  []Sprite,
+) {
 	for i := 0; i < len(intro); i++ {
 		intro[i].Free()
 	}
@@ -458,7 +470,8 @@ func startTwiJoy(ponyMdl *PonyModel, timescale float64) {
 }
 
 // Returns whether mainloop should stay active.
-func tick(bgLineYs     *[]float64,
+func tick(
+	bgLineYs       *[]float64,
 	bgText         Sprite,
 	drawIntro      int,
 	gameActive     *bool,
@@ -475,10 +488,10 @@ func tick(bgLineYs     *[]float64,
 	untilBgSpawn   *float64,
 	uptime         *float64,
 	wags           *int,
-	win            *sdl.Window) bool {
-	var (
-		delta float64
-	)
+	win            *sdl.Window,
+) bool {
+	var delta float64
+
 	delta = time.Since(*lastTick).Seconds()
 	if delta >= (1.0 / tickrate) {
 		delta *= timescale

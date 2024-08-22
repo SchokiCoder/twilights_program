@@ -58,9 +58,11 @@ func (s *Sprite) InitFromAsset(appPath string, assetPath string) {
 	s.Rect.H = s.surface.H
 }
 
-func (s *Sprite) InitFromText(text string,
+func (s *Sprite) InitFromText(
+	text string,
 	colors []sdl.Color,
-	fonts []*ttf.Font) {
+	fonts []*ttf.Font,
+) {
 	var (
 		err error
 		allS []*sdl.Surface
