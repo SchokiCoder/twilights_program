@@ -9,7 +9,13 @@ There is a clear cut between params and function start,
 which often is var declarations.
 No more weird alignment because of first param vs the other.
 
-- flatpak??
+- flatpak
+	+ add icon
+	- main.go: set icon
+	- add desktop file
+	- metainfo file
+	- linter
+	- check https://docs.flathub.org/docs/for-app-authors/requirements
 
 - linux package: consider ldflags -s -w
 
