@@ -12,6 +12,7 @@ import (
 	"runtime"
 	"strconv"
 	"time"
+	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 	"github.com/veandco/go-sdl2/mix"
@@ -553,6 +554,7 @@ func main() {
 		heartQue            int
 		hearts              [2]Sprite
 		heartLifetimes      [8]float64
+		icon                *sdl.Surface
 		intro               [2]Sprite
 		lastTick            time.Time
 		legacyFullscreen    bool
@@ -620,6 +622,14 @@ func main() {
 		panic(err)
 	}
 	defer win.Destroy()
+
+	icon, err = img.Load(AppName + ".svg")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Icon could not be loaded.\n%v\n", err)
+	}
+	defer icon.Free()
+
+	win.SetIcon(icon)
 
 	if fullscreen {
 		err = win.SetFullscreen(sdl.WINDOW_FULLSCREEN_DESKTOP)

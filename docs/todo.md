@@ -11,7 +11,8 @@ No more weird alignment because of first param vs the other.
 
 - flatpak
 	+ add icon
-	- main.go: set icon
+	+ set new icon as window icon
+	- fix icon not having the heart sprite
 	- add desktop file
 	- metainfo file
 	- linter
