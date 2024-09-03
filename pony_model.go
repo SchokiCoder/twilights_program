@@ -60,33 +60,48 @@ func (pm PonyModel) Draw() {
 
 func (pm *PonyModel) SetX(x int32) {
 	pm.Body.Rect.X = x
-	pm.Eye[0].Rect.X = x
-	pm.Eye[1].Rect.X = x
-	pm.Eye[2].Rect.X = x
-	pm.Rump[0].Rect.X = x
-	pm.Rump[1].Rect.X = x
-	pm.Tail[0].Rect.X = x
-	pm.Tail[1].Rect.X = x
+
+	for i := 0; i < len(pm.Eye); i++ {
+		pm.Eye[i].Rect.X = x
+	}
+
+	for i := 0; i < len(pm.Rump); i++ {
+		pm.Rump[i].Rect.X = x
+	}
+
+	for i := 0; i < len(pm.Tail); i++ {
+		pm.Tail[i].Rect.X = x
+	}
 }
 
 func (pm *PonyModel) SetY(y int32) {
 	pm.Body.Rect.Y = y
-	pm.Eye[0].Rect.Y = y
-	pm.Eye[1].Rect.Y = y
-	pm.Eye[2].Rect.Y = y
-	pm.Rump[0].Rect.Y = y
-	pm.Rump[1].Rect.Y = y
-	pm.Tail[0].Rect.Y = y
-	pm.Tail[1].Rect.Y = y
+
+	for i := 0; i < len(pm.Eye); i++ {
+		pm.Eye[i].Rect.Y = y
+	}
+
+	for i := 0; i < len(pm.Rump); i++ {
+		pm.Rump[i].Rect.Y = y
+	}
+
+	for i := 0; i < len(pm.Tail); i++ {
+		pm.Tail[i].Rect.Y = y
+	}
 }
 
 func (pm *PonyModel) Free() {
 	pm.Body.Free()
-	pm.Eye[0].Free()
-	pm.Eye[1].Free()
-	pm.Eye[2].Free()
-	pm.Rump[0].Free()
-	pm.Rump[1].Free()
-	pm.Tail[0].Free()
-	pm.Tail[1].Free()
+
+	for i := 0; i < len(pm.Eye); i++ {
+		pm.Eye[i].Free()
+	}
+
+	for i := 0; i < len(pm.Rump); i++ {
+		pm.Rump[i].Free()
+	}
+
+	for i := 0; i < len(pm.Tail); i++ {
+		pm.Tail[i].Free()
+	}
 }
