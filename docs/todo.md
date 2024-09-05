@@ -12,7 +12,7 @@ No more weird alignment because of first param vs the other.
 - flatpak
 	+ add icon
 	+ set new icon as window icon
-	- fix icon not having the heart sprite
+	+ fix icon not having a heart symbol
 	- add desktop file
 	- metainfo file
 	- linter
