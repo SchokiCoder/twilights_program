@@ -1,23 +1,5 @@
 # additional improvements
 
-+ enforce new formatting for function declarations
-
-Putting the first parameter already on a new line,
-and the closing parenthesis with return type and opening bracket on a
-new line fixes everything I disliked so far.
-There is a clear cut between params and function start,
-which often is var declarations.
-No more weird alignment because of first param vs the other.
-
-- flatpak
-	+ add icon
-	+ set new icon as window icon
-	+ fix icon not having a heart symbol
-	- add desktop file
-	- metainfo file
-	- linter
-	- check https://docs.flathub.org/docs/for-app-authors/requirements
-
 - linux package: consider ldflags -s -w
 
 - make heart lifetimes somewhat random?
@@ -40,6 +22,25 @@ No more weird alignment because of first param vs the other.
   between lines is too small,
   but recreating this barely notable inconsistency
   on purpose adds complexity that I am not too fond of
+
+-----
+
+# flatpak polish v1.1
+
++ enforce new formatting for function declarations
+
+Putting the first parameter already on a new line,
+and the closing parenthesis with return type and opening bracket on a
+new line fixes everything I disliked so far.
+There is a clear cut between params and function start,
+which often is var declarations.
+No more weird alignment because of first param vs the other.
+
++ add icon
++ set new icon as window icon
++ fix icon not having a heart symbol
+
++ set version to 1.1
 
 # basics v1.0
 
