@@ -30,6 +30,7 @@ vet:
 install: build
 	mkdir -p $(INSTALLDIR)
 	cp $(APP_NAME) $(INSTALLDIR_PARENT)/
+	cp $(APP_NAME).svg $(INSTALLDIR_PARENT)/
 	cp -r images $(INSTALLDIR)/
 	cp -r fonts $(INSTALLDIR)/
 	cp -r sounds $(INSTALLDIR)/
@@ -37,18 +38,20 @@ install: build
 uninstall:
 	rm -rf $(INSTALLDIR)/
 	rm $(INSTALLDIR_PARENT)/$(APP_NAME)
+	rm $(INSTALLDIR_PARENT)/$(APP_NAME).svg
 
 packages: package_linux_amd64.tar.gz package_windows_amd64.zip
 
 package_linux_amd64.tar.gz: $(APP_NAME)
-	tar -czf $@ $< fonts/ images/ sounds/ LICENSE
+	tar -czf $@ $< fonts/ images/ sounds/ LICENSE $(APP_NAME).svg
 
 $(APP_NAME): $(SRC)
 	go build $(GO_COMPILE_VARS)
 
 package_windows_amd64.zip: $(APP_NAME).exe
-	zip $@ $< images/*/* fonts/* sounds/* LICENSE
+	zip $@ $< images/*/* fonts/* sounds/* LICENSE $(APP_NAME).svg
 
+# Doesn't work under mint 22: SDL.h not found. Use 21 (and below (maybe idk)).
 $(APP_NAME).exe: $(SRC)
 	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 \
 		go build -tags static -ldflags "-s -w" $(GO_COMPILE_VARS)
