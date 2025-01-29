@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2024  Andy Frank Schoknecht
 
+APP_ID           :=io.github.SchokiCoder.twilights_program
 APP_NAME         :=twilights_program
 LICENSE          :=GPL-2.0-or-later
 LICENSE_URL      :=https://www.gnu.org/licenses/gpl-2.0.html
@@ -9,8 +10,7 @@ VERSION          :=v1.1
 GO_COMPILE_VARS  :=-ldflags "-X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepository=$(REPOSITORY)' -X 'main.AppVersion=$(VERSION)'"
 SRC              :=consts.go main.go pony_model.go sprite.go
 
-INSTALLDIR_PARENT :=$(HOME)/.local/bin
-INSTALLDIR        :=$(INSTALLDIR_PARENT)/$(APP_NAME)_data
+DESTDIR :=$(HOME)/.local/bin
 
 .PHONY: all build clean vet install uninstall
 
@@ -23,24 +23,32 @@ clean:
 	rm -f $(APP_NAME).exe
 	rm -f package_linux_amd64.tar.gz
 	rm -f package_windows_amd64.zip
+	rm -f $(APP_NAME)-amd64.AppImage
+	rm -fr AppDir
 
 vet:
 	go vet
 
 install: build
-	mkdir -p $(INSTALLDIR)
-	cp $(APP_NAME) $(INSTALLDIR_PARENT)/
-	cp $(APP_NAME).svg $(INSTALLDIR_PARENT)/
-	cp -r images $(INSTALLDIR)/
-	cp -r fonts $(INSTALLDIR)/
-	cp -r sounds $(INSTALLDIR)/
+	mkdir -p $(DESTDIR)
+	cp -t $(DESTDIR)/ \
+		$(APP_NAME) $(APP_NAME).svg
+	mkdir -p $(DESTDIR)/$(APP_NAME)_data/
+	cp -r -t $(DESTDIR)/$(APP_NAME)_data/ images fonts sounds
 
 uninstall:
-	rm -rf $(INSTALLDIR)/
-	rm $(INSTALLDIR_PARENT)/$(APP_NAME)
-	rm $(INSTALLDIR_PARENT)/$(APP_NAME).svg
+	rm -f $(DESTDIR)/$(APP_NAME) $(DESTDIR)/$(APP_NAME).svg
+	rm -fr $(DESTDIR)/$(APP_NAME)_data
 
 packages: package_linux_amd64.tar.gz package_windows_amd64.zip
+
+# adding metainfo/appdata spawns complaints about desktop file
+$(APP_NAME)-amd64.AppImage: $(APP_NAME)
+	make -e DESTDIR=AppDir install
+	mv AppDir/$(APP_NAME) AppDir/AppRun
+	cp AppDir/$(APP_NAME).svg AppDir/$(APP_ID).svg
+	cp $(APP_ID).desktop AppDir/
+	appimagetool AppDir $@
 
 package_linux_amd64.tar.gz: $(APP_NAME)
 	tar -czf $@ $< fonts/ images/ sounds/ LICENSE $(APP_NAME).svg

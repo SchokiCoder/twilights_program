@@ -1,5 +1,7 @@
+AppDir
 twilights_program
 twilights_program.exe
+*.AppImage
 *.zip
 *.tar.gz
 *.tar.xz

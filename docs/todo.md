@@ -23,6 +23,10 @@
   but recreating this barely notable inconsistency
   on purpose adds complexity that I am not too fond of
 
+# fixes
+
+- [ ] fix icon pathing (currently ONLY "./twilights_program.svg")
+
 -----
 
 # flatpak polish v1.1
