@@ -1,14 +1,10 @@
 # additional improvements
 
-- linux package: consider ldflags -s -w
-
 - make heart lifetimes somewhat random?
   possible, but adds quite some complexity for little visual difference
 
 - scale pony art up and then down to smudge it a bit?
   must be done at runtime, to accomodate different resolutions
-
-- consider wag speed cap (max = as seen in source)?
 
 - make texts properly pixelated?
   already are when upscaled...
@@ -23,9 +19,21 @@
   but recreating this barely notable inconsistency
   on purpose adds complexity that I am not too fond of
 
-# fixes
+# twi's prog : Update-sized Update
+
+- [x] remove unused go:generate comments
 
 - [ ] fix icon pathing (currently ONLY "./twilights_program.svg")
+
+- does the appimage need ldflags -s -w for SDL or do we need to package SDL in there?
+
+- use fixed deltaTime as ebitengine suggests?
+
+- consider wag speed cap (max = 60 / s)?
+
+- [ ] go fmt, go mod tidy
+
+- [ ] set version to 1.2
 
 -----
 
