@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2024  Andy Frank Schoknecht
+# Copyright (C) 2024 - 2025  Andy Frank Schoknecht
 
 APP_ID           :=io.github.SchokiCoder.twilights_program
 APP_NAME         :=twilights_program
@@ -7,10 +7,13 @@ LICENSE          :=GPL-2.0-or-later
 LICENSE_URL      :=https://www.gnu.org/licenses/gpl-2.0.html
 REPOSITORY       :=https://github.com/SchokiCoder/twilights_program
 VERSION          :=v1.1
-GO_COMPILE_VARS  :=-ldflags "-X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepository=$(REPOSITORY)' -X 'main.AppVersion=$(VERSION)'"
+GO_COMPILE_VARS  :=-ldflags "-X 'main.AppId=$(APP_ID)' -X 'main.AppName=$(APP_NAME)' -X 'main.AppLicense=$(LICENSE)' -X 'main.AppLicenseUrl=$(LICENSE_URL)' -X 'main.AppRepository=$(REPOSITORY)' -X 'main.AppVersion=$(VERSION)'"
 SRC              :=consts.go main.go pony_model.go sprite.go
 
-DESTDIR :=$(HOME)/.local/bin
+DESTDIR      :=/usr
+DESKTOP_FILE :=$(APP_ID).desktop
+ICON_FILE    :=$(APP_ID).svg
+METAINFO_FILE:=$(APP_ID).metainfo.xml
 
 .PHONY: all build clean vet install uninstall
 
@@ -21,43 +24,50 @@ build: $(APP_NAME)
 clean:
 	rm -f $(APP_NAME)
 	rm -f $(APP_NAME).exe
-	rm -f package_linux_amd64.tar.gz
-	rm -f package_windows_amd64.zip
-	rm -f $(APP_NAME)-amd64.AppImage
+	rm -f *.tar.gz
+	rm -f *.zip
+	rm -f *.AppImage
 	rm -fr AppDir
 
 vet:
 	go vet
 
 install: build
-	mkdir -p $(DESTDIR)
-	cp -t $(DESTDIR)/ \
-		$(APP_NAME) $(APP_NAME).svg
-	mkdir -p $(DESTDIR)/$(APP_NAME)_data/
-	cp -r -t $(DESTDIR)/$(APP_NAME)_data/ images fonts sounds
+	mkdir -p $(DESTDIR)/bin/
+	cp $(APP_NAME) $(DESTDIR)/bin/
+	mkdir -p $(DESTDIR)/share/$(APP_NAME)/
+	cp -r -t $(DESTDIR)/share/$(APP_NAME)/ images fonts sounds
+	mkdir -p $(DESTDIR)/share/icons/hicolor/scalable/apps
+	cp $(ICON_FILE) $(DESTDIR)/share/icons/hicolor/scalable/apps/
+	mkdir -p $(DESTDIR)/share/applications/
+	cp $(DESKTOP_FILE) $(DESTDIR)/share/applications/
+	mkdir -p $(DESTDIR)/share/metainfo/
+	cp $(METAINFO_FILE) $(DESTDIR)/share/metainfo/
 
 uninstall:
-	rm -f $(DESTDIR)/$(APP_NAME) $(DESTDIR)/$(APP_NAME).svg
-	rm -fr $(DESTDIR)/$(APP_NAME)_data
+	rm -f $(DESTDIR)/bin/$(APP_NAME)
+	rm -fr $(DESTDIR)/share/$(APP_NAME)/
+	rm -f $(DESTDIR)/share/icons/hicolor/scalable/apps/$(ICON_FILE)
+	rm -f $(DESTDIR)/share/applications/$(DESKTOP_FILE)
+	rm -f $(DESTDIR)/share/metainfo/$(METAINFO_FILE)
 
-packages: package_linux_amd64.tar.gz package_windows_amd64.zip
+packages: package_linux_amd64.tar.gz package_windows_amd64.zip $(APP_NAME)-amd64.AppImage
 
-# adding metainfo/appdata spawns complaints about desktop file
 $(APP_NAME)-amd64.AppImage: $(APP_NAME)
-	make -e DESTDIR=AppDir install
-	mv AppDir/$(APP_NAME) AppDir/AppRun
-	cp AppDir/$(APP_NAME).svg AppDir/$(APP_ID).svg
-	cp $(APP_ID).desktop AppDir/
-	appimagetool AppDir $@
+	make install DESTDIR=AppDir/usr
+	linuxdeploy --appdir AppDir \
+		-e $(APP_NAME) -d $(DESKTOP_FILE) -i $(ICON_FILE) \
+		--output appimage
+	mv *.AppImage $@
 
 package_linux_amd64.tar.gz: $(APP_NAME)
-	tar -czf $@ $< fonts/ images/ sounds/ LICENSE $(APP_NAME).svg
+	tar -czf $@ $< images fonts sounds $(ICON_FILE) $(DESKTOP_FILE) $(METAINFO_FILE) LICENSE
 
 $(APP_NAME): $(SRC)
 	go build $(GO_COMPILE_VARS)
 
 package_windows_amd64.zip: $(APP_NAME).exe
-	zip $@ $< images/*/* fonts/* sounds/* LICENSE $(APP_NAME).svg
+	zip $@ $< images/*/* fonts/* sounds/* LICENSE $(ICON_FILE)
 
 # Doesn't work under mint 22: SDL.h not found. Use 21 (and below (maybe idk)).
 $(APP_NAME).exe: $(SRC)

@@ -6,4 +6,5 @@ Type=Application
 Icon=io.github.SchokiCoder.twilights_program
 Comment=A game to spread happiness throughout the world.
 Categories=Game;
-Keywords=Game;Twilight;Program;
+Keywords=Game;Twilight;Program;Clicker;
+StartupWMClass=twilights_program

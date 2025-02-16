@@ -23,9 +23,11 @@
 
 - [x] remove unused go:generate comments
 
-- [ ] fix icon pathing (currently ONLY "./twilights_program.svg")
+- [x] rework packaging
+Fixes the AppImage, the install script, and icon pathing.
+Also updates copyrights.
 
-- does the appimage need ldflags -s -w for SDL or do we need to package SDL in there?
+- consider packaging for window via msi file ?
 
 - use fixed deltaTime as ebitengine suggests?
 

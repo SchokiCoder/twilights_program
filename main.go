@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// Copyright (C) 2024  Andy Frank Schoknecht
+// Copyright (C) 2024 - 2025  Andy Frank Schoknecht
 
 package main
 
@@ -18,6 +18,7 @@ import (
 )
 
 var (
+	AppId         string
 	AppLicense    string
 	AppLicenseUrl string
 	AppName       string
@@ -274,6 +275,7 @@ func initAudio(appPath string, sounds []*mix.Music) {
 	}
 
 	pathPrefixes := []string{
+		filepath.Join(appPath, "..", "share", AppName, "sounds"),
 		appPath,
 		filepath.Join(appPath, "sounds"),
 		filepath.Join(appPath, AppName + "_data", "sounds"),
@@ -335,6 +337,7 @@ func initText(
 	}
 
 	pathPrefixes := []string{
+		filepath.Join(appPath, "..", "share", AppName, "fonts"),
 		appPath,
 		filepath.Join(appPath, "fonts"),
 		filepath.Join(appPath, AppName + "_data", "fonts"),
@@ -622,9 +625,15 @@ func main() {
 	}
 	defer win.Destroy()
 
-	icon, err = img.Load(AppName + ".svg")
+	pathPrefixes := []string{
+		filepath.Join(appPath, "..", "share", "icons", "hicolor", "scalable", "apps"),
+		appPath,
+		filepath.Join(appPath, AppName + "_data"),
+	}
+	iconpath := getFilepathFromPaths(pathPrefixes, AppId + ".svg")
+	icon, err = img.Load(iconpath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Icon could not be loaded.\n%v\n", err)
+		fmt.Fprintf(os.Stderr, "Icon could not be loaded from:\n\"%v\"\n%v\n", iconpath, err)
 	}
 	defer icon.Free()
 

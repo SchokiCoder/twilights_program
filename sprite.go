@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// Copyright (C) 2024  Andy Frank Schoknecht
+// Copyright (C) 2024 - 2025  Andy Frank Schoknecht
 
 package main
 
@@ -31,6 +31,7 @@ func (s *Sprite) InitFromAsset(appPath string, assetPath string) {
 		err      error
 		fullpath string
 		pathPrefixes = []string{
+			filepath.Join(appPath, "..", "share", AppName, "images"),
 			appPath,
 			filepath.Join(appPath, "images"),
 			filepath.Join(appPath, AppName + "_data", "images"),
