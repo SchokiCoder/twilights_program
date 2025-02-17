@@ -69,7 +69,15 @@ $(APP_NAME): $(SRC)
 package_windows_amd64.zip: $(APP_NAME).exe
 	zip $@ $< images/*/* fonts/* sounds/* LICENSE $(ICON_FILE)
 
-# Doesn't work under mint 22: SDL.h not found. Use 21 (and below (maybe idk)).
+# ATTENTION, finicky:
+# Cross compile for windows will only work when SDL2 and SDL2_{ttf,mixer,...}
+# are installed into the mingw dirs (eg. "/usr/x86_64-w64-mingw32")
+# The necessary files (headers, dlls) may be provided by package manager,
+# BUT THEY MAY ALSO NOT WORK.
+# For example, on Fedora 41 I get errors about missing "X11/Xlib.h".
+# In such cases, don't waste your time, like I did,
+# and just grab the official release files from Github.
+
 $(APP_NAME).exe: $(SRC)
 	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 \
-		go build -tags static -ldflags "-s -w" $(GO_COMPILE_VARS)
+		go build $(GO_COMPILE_VARS)
