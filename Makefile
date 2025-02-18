@@ -52,7 +52,7 @@ uninstall:
 	rm -f $(DESTDIR)/share/applications/$(DESKTOP_FILE)
 	rm -f $(DESTDIR)/share/metainfo/$(METAINFO_FILE)
 
-packages: package_linux_amd64.tar.gz package_windows_amd64.zip $(APP_NAME)-amd64.AppImage
+packages: $(APP_NAME)-linux-amd64.tar.gz $(APP_NAME)-windows-amd64.zip $(APP_NAME)-amd64.AppImage
 
 $(APP_NAME)-amd64.AppImage: $(APP_NAME)
 	make install DESTDIR=AppDir/usr
