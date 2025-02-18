@@ -28,6 +28,7 @@ clean:
 	rm -f *.zip
 	rm -f *.AppImage
 	rm -fr AppDir
+	rm -fr pkg
 
 vet:
 	go vet
@@ -60,14 +61,34 @@ $(APP_NAME)-amd64.AppImage: $(APP_NAME)
 		--output appimage
 	mv *.AppImage $@
 
-package_linux_amd64.tar.gz: $(APP_NAME)
+$(APP_NAME)-linux-amd64.tar.gz: $(APP_NAME)
 	tar -czf $@ $< images fonts sounds $(ICON_FILE) $(DESKTOP_FILE) $(METAINFO_FILE) LICENSE
 
 $(APP_NAME): $(SRC)
 	go build $(GO_COMPILE_VARS)
 
-package_windows_amd64.zip: $(APP_NAME).exe
+SDL2.zip:
+	curl -L https://github.com/libsdl-org/SDL/releases/download/release-2.32.0/SDL2-2.32.0-win32-x64.zip -o $@
+
+SDL2_image.zip:
+	curl -L https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.5/SDL2_image-2.8.5-win32-x64.zip -o $@
+
+SDL2_mixer.zip:
+	curl -L https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.1/SDL2_mixer-2.8.1-win32-x64.zip -o $@
+
+SDL2_ttf.zip:
+	curl -L https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.24.0/SDL2_ttf-2.24.0-win32-x64.zip -o $@
+
+$(APP_NAME)-windows-amd64.zip: $(APP_NAME).exe SDL2.zip SDL2_image.zip SDL2_mixer.zip SDL2_ttf.zip
+	mkdir -p pkg
+	cp *.zip pkg/
+	cd pkg && unzip -o SDL2.zip
+	cd pkg && unzip -o SDL2_image.zip
+	cd pkg && unzip -o SDL2_mixer.zip
+	cd pkg && unzip -o SDL2_ttf.zip
 	zip $@ $< images/*/* fonts/* sounds/* LICENSE $(ICON_FILE)
+	cd pkg && zip ../$@ *.dll README-SDL.txt
+	cd pkg/optional && zip ../../$@ *
 
 # ATTENTION, finicky:
 # Cross compile for windows will only work when SDL2 and SDL2_{ttf,mixer,...}

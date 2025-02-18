@@ -27,7 +27,9 @@
 Fixes the AppImage, the install script, and icon pathing.
 Also updates copyrights.
 
-- consider packaging for window via msi file ?
+- [x] fix windows packaging
+Since I can't reliably compile statically, I have to get the dlls. Fun.
+Also rename package names to anything sensible.
 
 - use fixed deltaTime as ebitengine suggests?
 
