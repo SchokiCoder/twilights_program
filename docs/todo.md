@@ -22,7 +22,9 @@
 - use fixed deltaTime as ebitengine suggests?
   I mean, it's not like this will ever lag anyway
 
-# twi's prog : Update-sized Update
+-----
+
+# Update-sized Update
 
 - [x] remove unused go:generate comments
 
@@ -36,9 +38,7 @@ Also rename package names to anything sensible.
 
 - [x] go fmt
 
-- [ ] set version to 1.2
-
------
+- [x] set version to 1.2
 
 # flatpak polish v1.1
 
