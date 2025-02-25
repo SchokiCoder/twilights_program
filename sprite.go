@@ -5,10 +5,10 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
-	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/img"
+	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
+	"path/filepath"
 )
 
 type Sprite struct {
@@ -19,8 +19,8 @@ type Sprite struct {
 }
 
 func newSprite(renderer *sdl.Renderer) Sprite {
-	var ret = Sprite {
-		renderer: renderer, 
+	var ret = Sprite{
+		renderer: renderer,
 	}
 
 	return ret
@@ -28,13 +28,13 @@ func newSprite(renderer *sdl.Renderer) Sprite {
 
 func (s *Sprite) InitFromAsset(appPath string, assetPath string) {
 	var (
-		err      error
-		fullpath string
+		err          error
+		fullpath     string
 		pathPrefixes = []string{
 			filepath.Join(appPath, "..", "share", AppName, "images"),
 			appPath,
 			filepath.Join(appPath, "images"),
-			filepath.Join(appPath, AppName + "_data", "images"),
+			filepath.Join(appPath, AppName+"_data", "images"),
 		}
 	)
 
@@ -64,7 +64,7 @@ func (s *Sprite) InitFromText(
 	fonts []*ttf.Font,
 ) {
 	var (
-		err error
+		err  error
 		allS []*sdl.Surface
 	)
 

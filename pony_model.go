@@ -4,8 +4,8 @@
 package main
 
 import (
-	"path/filepath"
 	"github.com/veandco/go-sdl2/sdl"
+	"path/filepath"
 )
 
 type PonyModel struct {

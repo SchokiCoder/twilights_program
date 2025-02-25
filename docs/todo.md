@@ -19,6 +19,9 @@
   but recreating this barely notable inconsistency
   on purpose adds complexity that I am not too fond of
 
+- use fixed deltaTime as ebitengine suggests?
+  I mean, it's not like this will ever lag anyway
+
 # twi's prog : Update-sized Update
 
 - [x] remove unused go:generate comments
@@ -31,11 +34,7 @@ Also updates copyrights.
 Since I can't reliably compile statically, I have to get the dlls. Fun.
 Also rename package names to anything sensible.
 
-- use fixed deltaTime as ebitengine suggests?
-
-- consider wag speed cap (max = 60 / s)?
-
-- [ ] go fmt, go mod tidy
+- [x] go fmt
 
 - [ ] set version to 1.2
 

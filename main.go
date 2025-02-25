@@ -6,15 +6,15 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/veandco/go-sdl2/img"
+	"github.com/veandco/go-sdl2/mix"
+	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"time"
-	"github.com/veandco/go-sdl2/img"
-	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/ttf"
-	"github.com/veandco/go-sdl2/mix"
 )
 
 var (
@@ -32,7 +32,7 @@ func confirmationPrompt(question string) bool {
 	var input = make([]byte, 4)
 
 	for {
-		fmt.Printf("%v (y/n)\n", question);
+		fmt.Printf("%v (y/n)\n", question)
 
 		_, err := fmt.Scanln(&input)
 		if err != nil {
@@ -50,20 +50,20 @@ func confirmationPrompt(question string) bool {
 }
 
 func draw(
-	bgLineYs       []float64,
-	bgLine         Sprite,
-	drawIntro      int,
-	hearts         [2]Sprite,
+	bgLineYs []float64,
+	bgLine Sprite,
+	drawIntro int,
+	hearts [2]Sprite,
 	heartLifetimes []float64,
-	intro          [2]Sprite,
-	ponyMdl        PonyModel,
-	renderer       *sdl.Renderer,
-	win            *sdl.Window,
+	intro [2]Sprite,
+	ponyMdl PonyModel,
+	renderer *sdl.Renderer,
+	win *sdl.Window,
 ) {
 	renderer.SetDrawColor(49, 229, 184, 255)
 	renderer.Clear()
 
-	bgLine.Rect.X = gfxWindowWidth / 2 - bgLine.Rect.W / 2
+	bgLine.Rect.X = gfxWindowWidth/2 - bgLine.Rect.W/2
 
 	for i := 0; i < len(bgLineYs); i++ {
 		bgLine.Rect.Y = int32(bgLineYs[i])
@@ -74,12 +74,12 @@ func draw(
 
 	hPos := getHeartPositions()
 	for i := 0; i < len(heartLifetimes); i++ {
-		if heartLifetimes[i] >= heartLifetime - heartBigLifetime {
+		if heartLifetimes[i] >= heartLifetime-heartBigLifetime {
 			hearts[0].Rect.X = hPos[i].X
 			hearts[0].Rect.Y = hPos[i].Y
 			hearts[0].Draw()
-		} else if heartLifetimes[i] >= heartLifetime -
-				heartBigLifetime - heartSmallLifetime {
+		} else if heartLifetimes[i] >= heartLifetime-
+			heartBigLifetime-heartSmallLifetime {
 			hearts[1].Rect.X = hPos[i].X
 			hearts[1].Rect.Y = hPos[i].Y
 			hearts[1].Draw()
@@ -123,10 +123,10 @@ func getFilepathFromPaths(pathPrefixes []string, path string) string {
 // Returns whether app should stay active.
 func handleArgs(
 	enableConfirmations *bool,
-	fullscreen          *bool,
-	playClearSound      *bool,
-	tickrate            *float64,
-	timescale           *float64,
+	fullscreen *bool,
+	playClearSound *bool,
+	tickrate *float64,
+	timescale *float64,
 ) bool {
 	var err error
 
@@ -183,7 +183,7 @@ func handleArgs(
 		case "-r":
 			fallthrough
 		case "--tickrate":
-			*tickrate, err = strconv.ParseFloat(os.Args[i + 1], 64)
+			*tickrate, err = strconv.ParseFloat(os.Args[i+1], 64)
 			if err != nil {
 				fmt.Fprintf(os.Stderr,
 					"Argument for tickrate is not a valid float.\n")
@@ -194,7 +194,7 @@ func handleArgs(
 		case "-t":
 			fallthrough
 		case "--timescale":
-			*timescale, err = strconv.ParseFloat(os.Args[i + 1], 64)
+			*timescale, err = strconv.ParseFloat(os.Args[i+1], 64)
 			if err != nil {
 				fmt.Fprintf(os.Stderr,
 					"Argument for timescale is not a valid float.\n")
@@ -215,10 +215,10 @@ func handleArgs(
 func handleEvents(
 	gameActive *bool,
 	heartCount *int,
-	heartQue   *int,
-	ponyMdl    *PonyModel,
-	timescale  float64,
-	wags       *int,
+	heartQue *int,
+	ponyMdl *PonyModel,
+	timescale float64,
+	wags *int,
 ) bool {
 	event := sdl.PollEvent()
 
@@ -248,11 +248,11 @@ func handleEvents(
 
 				case sdl.K_SPACE:
 					onWag(gameActive,
-					heartCount,
-					heartQue,
-					ponyMdl,
-					timescale,
-					wags)
+						heartCount,
+						heartQue,
+						ponyMdl,
+						timescale,
+						wags)
 				}
 			}
 		}
@@ -278,7 +278,7 @@ func initAudio(appPath string, sounds []*mix.Music) {
 		filepath.Join(appPath, "..", "share", AppName, "sounds"),
 		appPath,
 		filepath.Join(appPath, "sounds"),
-		filepath.Join(appPath, AppName + "_data", "sounds"),
+		filepath.Join(appPath, AppName+"_data", "sounds"),
 	}
 	paths := []string{
 		"Mappy - Main Theme.ogg",
@@ -302,11 +302,11 @@ func initAudio(appPath string, sounds []*mix.Music) {
 }
 
 func initGfx(
-	appPath  string,
-	hearts   []Sprite,
-	ponyMdl  *PonyModel,
+	appPath string,
+	hearts []Sprite,
+	ponyMdl *PonyModel,
 	renderer *sdl.Renderer,
-	win      *sdl.Window,
+	win *sdl.Window,
 ) {
 	hearts[0] = newSprite(renderer)
 	hearts[0].InitFromAsset(appPath, "heart/big.png")
@@ -322,11 +322,11 @@ func initGfx(
 }
 
 func initText(
-	appPath  string,
+	appPath string,
 	bgLineYs *[]float64,
-	bgText   *Sprite,
-	fonts    []*ttf.Font,
-	intro    []Sprite,
+	bgText *Sprite,
+	fonts []*ttf.Font,
+	intro []Sprite,
 	renderer *sdl.Renderer,
 ) {
 	var err error
@@ -340,7 +340,7 @@ func initText(
 		filepath.Join(appPath, "..", "share", AppName, "fonts"),
 		appPath,
 		filepath.Join(appPath, "fonts"),
-		filepath.Join(appPath, AppName + "_data", "fonts"),
+		filepath.Join(appPath, AppName+"_data", "fonts"),
 	}
 
 	fullpath := getFilepathFromPaths(pathPrefixes, "DejaVuSansMono.ttf")
@@ -363,10 +363,10 @@ func initText(
 	intro[1] = newSprite(renderer)
 	intro[1].InitFromText("DOG", getIntroColors(), fonts[:])
 
-	intro[1].Rect.X = gfxWindowWidth / 2 - intro[1].Rect.W / 2
-	intro[1].Rect.Y = gfxWindowHeight / 2 - intro[1].Rect.H / 2
+	intro[1].Rect.X = gfxWindowWidth/2 - intro[1].Rect.W/2
+	intro[1].Rect.Y = gfxWindowHeight/2 - intro[1].Rect.H/2
 
-	intro[0].Rect.X = gfxWindowWidth / 2 - intro[0].Rect.W / 2
+	intro[0].Rect.X = gfxWindowWidth/2 - intro[0].Rect.W/2
 	intro[0].Rect.Y = intro[1].Rect.Y - intro[1].Rect.H
 
 	*bgText = newSprite(renderer)
@@ -377,14 +377,14 @@ func initText(
 }
 
 func moveBgLines(
-	bgLineYs     *[]float64,
-	delta        float64,
+	bgLineYs *[]float64,
+	delta float64,
 	untilBgSpawn *float64,
-	lineHeight   int32,
+	lineHeight int32,
 ) {
 	*untilBgSpawn -= delta
 	if *untilBgSpawn <= 0 {
-		*bgLineYs = append(*bgLineYs, float64(0 - lineHeight))
+		*bgLineYs = append(*bgLineYs, float64(0-lineHeight))
 		*untilBgSpawn = bgLineSpawnTime
 	}
 
@@ -392,7 +392,7 @@ func moveBgLines(
 		(*bgLineYs)[i] += bgLineVelocity * delta
 	}
 
-	if len(*bgLineYs) > gfxBgMaxLines + 1 {
+	if len(*bgLineYs) > gfxBgMaxLines+1 {
 		*bgLineYs = (*bgLineYs)[1:]
 	}
 }
@@ -400,10 +400,10 @@ func moveBgLines(
 func onWag(
 	gameActive *bool,
 	heartCount *int,
-	heartQue   *int,
-	ponyMdl    *PonyModel,
-	timescale  float64,
-	wags       *int,
+	heartQue *int,
+	ponyMdl *PonyModel,
+	timescale float64,
+	wags *int,
 ) {
 	if *gameActive {
 		if ponyMdl.RumpIdx == 0 {
@@ -419,7 +419,7 @@ func onWag(
 			go startTwiJoy(ponyMdl, timescale)
 		}
 
-		if int(float64(*wags) / wagsForHeart) > *heartCount {
+		if int(float64(*wags)/wagsForHeart) > *heartCount {
 			*heartCount++
 			*heartQue++
 		}
@@ -437,8 +437,8 @@ func quitAudio(sounds []*mix.Music) {
 }
 
 func quitGfx(
-	hearts   []Sprite,
-	ponyMdl  *PonyModel,
+	hearts []Sprite,
+	ponyMdl *PonyModel,
 	renderer *sdl.Renderer,
 ) {
 	for i := 0; i < len(hearts); i++ {
@@ -450,8 +450,8 @@ func quitGfx(
 
 func quitText(
 	bgText *Sprite,
-	fonts  []*ttf.Font,
-	intro  []Sprite,
+	fonts []*ttf.Font,
+	intro []Sprite,
 ) {
 	for i := 0; i < len(intro); i++ {
 		intro[i].Free()
@@ -467,31 +467,32 @@ func quitText(
 
 func startTwiJoy(ponyMdl *PonyModel, timescale float64) {
 	joyDelayBegin := time.Now()
-	for time.Since(joyDelayBegin).Seconds() * timescale < joyThroughWagsDelay {}
+	for time.Since(joyDelayBegin).Seconds()*timescale < joyThroughWagsDelay {
+	}
 
 	ponyMdl.EyeIdx = 2
 }
 
 // Returns whether mainloop should stay active.
 func tick(
-	bgLineYs       *[]float64,
-	bgText         Sprite,
-	drawIntro      int,
-	gameActive     *bool,
-	heartCount     *int,
-	heartQue       *int,
-	hearts         [2]Sprite,
+	bgLineYs *[]float64,
+	bgText Sprite,
+	drawIntro int,
+	gameActive *bool,
+	heartCount *int,
+	heartQue *int,
+	hearts [2]Sprite,
 	heartLifetimes []float64,
-	intro          [2]Sprite,
-	lastTick       *time.Time,
-	ponyMdl        *PonyModel,
-	renderer       *sdl.Renderer,
-	tickrate       float64,
-	timescale      float64,
-	untilBgSpawn   *float64,
-	uptime         *float64,
-	wags           *int,
-	win            *sdl.Window,
+	intro [2]Sprite,
+	lastTick *time.Time,
+	ponyMdl *PonyModel,
+	renderer *sdl.Renderer,
+	tickrate float64,
+	timescale float64,
+	untilBgSpawn *float64,
+	uptime *float64,
+	wags *int,
+	win *sdl.Window,
 ) bool {
 	var delta float64
 
@@ -581,13 +582,13 @@ func main() {
 	appPath = filepath.Dir(appPath)
 
 	enableConfirmations = true
-	fullscreen          = false
-	gameActive          = false
-	legacyFullscreen    = false
-	mainloopActive      = true
-	playClearSound      = true
-	tickrate            = stdTickrate
-	timescale           = stdTimescale
+	fullscreen = false
+	gameActive = false
+	legacyFullscreen = false
+	mainloopActive = true
+	playClearSound = true
+	tickrate = stdTickrate
+	timescale = stdTimescale
 
 	if handleArgs(&enableConfirmations,
 		&fullscreen,
@@ -617,8 +618,8 @@ func main() {
 	win, err = sdl.CreateWindow("Twilight's Program",
 		sdl.WINDOWPOS_UNDEFINED,
 		sdl.WINDOWPOS_UNDEFINED,
-		int32(gfxWindowWidth * gfxScale),
-		int32(gfxWindowHeight * gfxScale),
+		int32(gfxWindowWidth*gfxScale),
+		int32(gfxWindowHeight*gfxScale),
 		sdl.WINDOW_SHOWN)
 	if err != nil {
 		panic(err)
@@ -628,9 +629,9 @@ func main() {
 	pathPrefixes := []string{
 		filepath.Join(appPath, "..", "share", "icons", "hicolor", "scalable", "apps"),
 		appPath,
-		filepath.Join(appPath, AppName + "_data"),
+		filepath.Join(appPath, AppName+"_data"),
 	}
-	iconpath := getFilepathFromPaths(pathPrefixes, AppId + ".svg")
+	iconpath := getFilepathFromPaths(pathPrefixes, AppId+".svg")
 	icon, err = img.Load(iconpath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Icon could not be loaded from:\n\"%v\"\n%v\n", iconpath, err)
@@ -682,33 +683,38 @@ func main() {
 	untilBgSpawn = bgLineSpawnTime
 
 	go func() {
-		for time.Since(start).Seconds() * timescale < introDogTime {}
+		for time.Since(start).Seconds()*timescale < introDogTime {
+		}
 		drawIntro++
 	}()
 
 	go func() {
-		for time.Since(start).Seconds() * timescale < gameStartTime {}
+		for time.Since(start).Seconds()*timescale < gameStartTime {
+		}
 		gameActive = true
 	}()
 
 	go func() {
-		var eyeMovement  time.Time
+		var eyeMovement time.Time
 
-		for time.Since(start).Seconds() * timescale < introLifetime {}
+		for time.Since(start).Seconds()*timescale < introLifetime {
+		}
 		eyeMovement = time.Now()
 		drawIntro = 0
 
 		for gameActive && ponyMdl.EyeIdx != 2 {
-			for time.Since(eyeMovement).Seconds() * timescale <
-				eyeOpenedDuration {}
+			for time.Since(eyeMovement).Seconds()*timescale <
+				eyeOpenedDuration {
+			}
 
 			if ponyMdl.EyeIdx != 2 {
 				ponyMdl.EyeIdx = 1
 			}
 			eyeMovement = time.Now()
 
-			for time.Since(eyeMovement).Seconds() * timescale <
-				eyeClosedDuration {}
+			for time.Since(eyeMovement).Seconds()*timescale <
+				eyeClosedDuration {
+			}
 
 			if ponyMdl.EyeIdx != 2 {
 				ponyMdl.EyeIdx = 0
@@ -718,7 +724,8 @@ func main() {
 	}()
 
 	go func() {
-		for gameActive == false {}
+		for gameActive == false {
+		}
 		if mainloopActive {
 			mix.HaltMusic()
 			sounds[2].Play(0)
@@ -783,13 +790,13 @@ Twiggy wagged %v times,
 and produced %v hearts of joy.
 %v ponies had joy in the making of this film.
 
-`, uptime - gameStartTime, wags, heartCount, hadJoy)
+`, uptime-gameStartTime, wags, heartCount, hadJoy)
 
 	if enableConfirmations {
 		if runtime.GOOS == "windows" {
-				confirmationPrompt("Have you read?")
-				fmt.Printf("Oh, good. "+
-					"Billy really wanted to make sure you did.\n")
+			confirmationPrompt("Have you read?")
+			fmt.Printf("Oh, good. " +
+				"Billy really wanted to make sure you did.\n")
 		} else {
 			fmt.Printf("Press <Enter> to continue.\n")
 			dummy := []byte{'0'}
